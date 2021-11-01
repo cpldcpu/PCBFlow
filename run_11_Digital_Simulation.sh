@@ -1,4 +1,3 @@
-cd 01_HDL
-make 
+cd 10_HDL
 make view
 cd ..
