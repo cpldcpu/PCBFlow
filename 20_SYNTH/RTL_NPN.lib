@@ -1,0 +1,87 @@
+
+* This is the transistor model used to simulate RTL gates
+* It can be changed to implement different transistor types without having to edit all subckt files.
+
+***********************************************************
+*
+* PMBT3904
+*
+* Nexperia
+*
+* NPN switching Transistor
+* IC   = 200 mA
+* VCEO = 40 V 
+* hFE  = 100 - 300  @ 1V/10mA
+*
+*
+*
+*
+* Package pinning does not match Spice model pinning.
+* Package: SOT 23
+* 
+* Package Pin 1: Base      
+* Package Pin 2: Emitter        
+* Package Pin 3: Collector 
+*
+*
+* Extraction date (week/year): 25/2014
+* Spicemodel includes temperature dependency
+*
+**********************************************************
+
+* .MODEL RTL_NPN npn(IS=1.11089e-14 BF=320.82 NF=0.980954 VAF=13.7591 IKF=0.0454909 ISE=1e-16 NE=1.17033 BR=4.34852 NR=1.0038 VAR=99.7542 IKR=0.156455 ISC=9.81183e-14 NC=2.87399 RB=0.1 IRB=0.2 RBM=0.1 RE=1.81526 RC=0.001 XTB=1.73971 XTI=1 EG=1.206 CJE=7.02461e-12 VJE=0.74856 MJE=0.331575 TF=1e-09 XTF=1 VTF=10 ITF=0.01 CJC=4.71202e-12 VJC=0.95 MJC=0.401177 XCJC=0.9 FC=0.5)
+
+
+.MODEL RTL_DIODE D
++ IS = 1.82E-013
++ N = 1.042
++ BV = 1000
++ IBV = 0.001
++ RS = 380.9
++ CJO = 0
++ VJ = 1
++ M = 0.5
++ FC = 0
++ TT = 0
++ EG = 1.11
++ XTI = 3
+
+.MODEL RTL_NPN NPN
++ IS = 2.612E-015
++ NF = 1.005
++ ISE = 2.958E-015
++ NE = 1.533
++ BF = 169
++ IKF = 0.08351
++ VAF = 53.92
++ NR = 0.9982
++ ISC = 3.177E-016
++ NC = 1.094
++ BR = 2.107
++ IKR = 0.5
++ VAR = 100
++ RB = 114
++ IRB = 0.001
++ RBM = 6.2
++ RE = 0.04181
++ RC = 0.9576
++ XTB = 1.522
++ EG = 1.11
++ XTI = 4.633
++ CJE = 1.032E-011
++ VJE = 0.6333
++ MJE = 0.2056
++ TF = 3.55E-010
++ XTF = 10
++ VTF = 2
++ ITF = 0.3
++ PTF = 0
++ CJC = 3.181E-012
++ VJC = 0.8831
++ MJC = 0.3242
++ XCJC = 1
++ TR = 0.7E-007
++ CJS = 0
++ VJS = 0.75
++ MJS = 0.333
++ FC = 0.78

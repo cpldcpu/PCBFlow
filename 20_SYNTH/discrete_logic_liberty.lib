@@ -1,5 +1,14 @@
 /*
-  Basic RTL cells
+  Basic logic cells for a logic family based on discrete NPN transistors (Resistor Transistor Logic)
+  BUF
+
+Logic gates:
+  NOT
+  NOR2
+  NOR3
+
+A single D-Flop:
+  DFF
 */
 
 

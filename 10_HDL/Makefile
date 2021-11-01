@@ -1,5 +1,5 @@
-# SILT1 Simluation workflow
-# June 12th - TB
+# VHDL Simluation workflow
+# 2021-Nov-01 cpldcpu
 #
 # Implements the following pipeline
 # 3) analyze and evaluate  VHDL source using GHDL
