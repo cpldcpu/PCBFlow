@@ -1,0 +1,25 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Mon Nov 01 13:05:35 2021
+[*]
+[dumpfile] "D:\VHDL\PCBFlow\01_HDL\waveforms.ghw"
+[dumpfile_mtime] "Mon Nov 01 13:04:22 2021"
+[dumpfile_size] 21477
+[savefile] "D:\VHDL\PCBFlow\01_HDL\gtkviewsettings.gtkw"
+[timestart] 0
+[size] 2048 1089
+[pos] -1 -1
+*-28.436033 132000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.testbench.
+[sst_width] 197
+[signals_width] 120
+[sst_expanded] 1
+[sst_vpaned_height] 325
+@28
+top.testbench.clk
+top.testbench.rst
+@29
+#{top.testbench.count[2:0]} top.testbench.count[2] top.testbench.count[1] top.testbench.count[0]
+[pattern_trace] 1
+[pattern_trace] 0
