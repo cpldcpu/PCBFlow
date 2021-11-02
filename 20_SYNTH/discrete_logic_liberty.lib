@@ -7,7 +7,7 @@ Logic gates:
   NOR2
   NOR3
 
-A single D-Flop:
+D-Flop:
   DFF
 */
 
@@ -28,6 +28,14 @@ library(SingleLogicCells) {
               function: "A'"; }
   }
 
+  cell(NOR2) {
+    area: 2;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A+B)'"; }
+  }
+
   cell(NOR3) {
     area: 3;
     pin(A) { direction: input; }
@@ -37,17 +45,8 @@ library(SingleLogicCells) {
              function: "(A+B+C)'"; }
   }
 
-
-  cell(NOR2) {
-    area: 2;
-    pin(A) { direction: input; }
-    pin(B) { direction: input; }
-    pin(Y) { direction: output;
-             function: "(A+B)'"; }
-  }
-
   cell(DFF) {
-    area: 7;
+    area: 15;
     ff(IQ, IQN) { clocked_on: C;
                   next_state: D; }
     pin(C) { direction: input;
