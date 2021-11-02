@@ -16,13 +16,15 @@ Vcc Vcc 0 DC 5
 .param RB=4.7k
 
 * input signals
-*Vclk clk 0 PULSE(0 5 1 0.1 0.1 0.8 2)
-*Vrst rst 0 PULSE(0 5 0.5 0.1 0.1 2.9 40)
 
 Vclk clk 0 PULSE(0 5 10u 20n 20n 8u 20u)
 Vrst rst 0 PULSE(0 5 5u 20n 20n 29u 400u)
 
-Xuut clk rst out0 out1 out2 COUNTERx
+
+* Note: No pull up needed on outputs since they are internally connected. B
+* Pull ups may have to be added for other designs
+
+Xuut clk rst out0 out1 out2 main
 
 .tran 20n 400u
 
