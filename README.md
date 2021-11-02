@@ -8,7 +8,7 @@ Makes use of:
 -   ABC
 -   GTKView
 -   NGspice
--   PCBPlace - my own P&R tool written in Python
+-   PCBPlace - my own placement tool written in Python
 -   Freerouting (Optional)
 -   Eagle (Optional)
 -   EasyEDA (Optional)
