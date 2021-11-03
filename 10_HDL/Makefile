@@ -1,4 +1,4 @@
-# VHDL Simluation workflow
+# VHDL Simulation workflow
 # 2021-Nov-01 cpldcpu
 #
 # Implements the following pipeline
@@ -19,12 +19,11 @@ TESTBENCH = testbench
 # GHDL CONFIG
 GHDL_CMD 		= ghdl
 GHDL_FLAGS  	= --ieee=synopsys -fexplicit -Whide 
-GHDL_SIM_FLAGS 	= --stop-time=100us --ieee-asserts=disable # Hide ieee library asserts caused by sram model
+GHDL_SIM_FLAGS 	= --stop-time=100us --ieee-asserts=disable # Hide ieee library asserts 
 
 #GTKWAVE CONFIG
 GTKWAVE_CMD	 	= gtkwave.exe
 GTKWAVE_FLAGS   = gtkviewsettings.gtkw --rcvar 'fontname_signals Monospace 11' --rcvar 'fontname_waves Monospace 11' # font size
-
 
 .PHONY: clean
 
@@ -42,8 +41,8 @@ waveforms.vcd: work-obj93.cf
 
 view: waveforms.ghw
 # START "" gtkwave waveforms.ghw gtkviewsettings.gtkw
-	$(GTKWAVE_CMD) waveforms.ghw  $(GTKWAVE_FLAGS) &
+	$(GTKWAVE_CMD) waveforms.ghw  $(GTKWAVE_FLAGS) & 
 # use the line above on linux
 
 clean:
-	rm -f *.cf *.ghw *.vcd asm/*.l asm/*.o memory.dat
+	rm -f *.cf *.ghw *.vcd 
