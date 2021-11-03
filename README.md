@@ -25,7 +25,7 @@ The diagram above shows how the individual steps of the flow are connected. The 
 
 Right now, everything is based on shell scripts that have to be invoked manually and sub-sequentially. The numbers in the process boxes indicate the number of the script that performs this step. Scripts ending on zero (10,20,30) are mandatory steps for the flow, scripts ending on other digits are optional, e.g. for intermediate simulation.
 
-The technology description files and scripts reside in subfolders [10](10_HDL/),[20](20_SYNTH/),[30](30_PLACE/). [10](10_HDL/) also holds the design files.
+The technology description files and additional date reside in subfolders [10](10_HDL/),[20](20_SYNTH/),[30](30_PLACE/). [10](10_HDL/) also holds the design files.
 
 Please be aware that the placement tool is in a very early experimental stage. Constants in the code may have to be tuned for better results depending on input design.
 
