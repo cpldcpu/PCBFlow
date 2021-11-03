@@ -31,4 +31,4 @@ Please be aware that the placement tool is in a very early experimental stage. C
 
 All intermediate and output files are stored in the [Work](Work/) folder. It can be cleaned by calling the "clean_all.sh" script.
 
-Right now the output of the automated part of the flow ends with an unrouted PCB. Routing and design file generation has to be invoked manually with the indicated tools. 
+The output of the automated part of the flow is an unrouted PCB. Routing and design file generation has to be invoked manually with the indicated tools. 
