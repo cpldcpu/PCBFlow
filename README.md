@@ -34,8 +34,15 @@ All intermediate and output files are stored in the [Work](Work/) folder. It can
 
 The output of the automated part of the flow is an unrouted PCB. Routing and design file generation has to be invoked manually with the indicated tools. 
 
-# Example
+# Examples
 
 The image below shows a basic example, implementing a full adder and an and gate, going from source code via intermediate representations to the final 3D rendered PCB.
 
 ![Example](Images/example.png)
+
+As a more complex example, you can see the synthesized [MCPU](https://github.com/cpldcpu/MCPU) below. The design consists of 771 transistors and twice as many resistors. Routing was performed with Freerouter. 
+
+![MCPU](Images/mcpu_routed.png)
+
+
+
