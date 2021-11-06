@@ -3,6 +3,8 @@
 # Invokes GHDL, Yosys and ABC (via Yosys)
 #  
 
+# --->>>>  Require name of HDL source file as argument <<<<---
+
 # set HDLCODE = "counter.vhd"  # Name of source file from "10_HDL"
 
 cd Work
