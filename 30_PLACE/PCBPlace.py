@@ -50,20 +50,20 @@ class PCBPlacer():
             et.SubElement(n_signet, 'contactref', element = element, pad = pad)
 
 
-    def insertNOR3(self,x, y, netin1, netin2, netin3, netout, pitch=3.8):
-        """Insert NOR3 at position x,y
-        Assumes inverters that can be combined to wired AND at output"""
+    # def insertNOR3(self,x, y, netin1, netin2, netin3, netout, pitch=3.8):
+    #     """Insert NOR3 at position x,y
+    #     Assumes inverters that can be combined to wired AND at output"""
 
-        self.insertNOT(x+0*pitch,y, netin1, netout)
-        self.insertNOT(x+1*pitch,y, netin2, netout)
-        self.insertNOT(x+2*pitch,y, netin3, netout)
+    #     self.insertNOT(x+0*pitch,y, netin1, netout)
+    #     self.insertNOT(x+1*pitch,y, netin2, netout)
+    #     self.insertNOT(x+2*pitch,y, netin3, netout)
 
-    def insertNOR2(self,x, y, netin1, netin2, netout, pitch=3.8):
-        """Insert NOR2 at position x,y
-        Assumes inverters that can be combined to wired AND at output"""
+    # def insertNOR2(self,x, y, netin1, netin2, netout, pitch=3.8):
+    #     """Insert NOR2 at position x,y
+    #     Assumes inverters that can be combined to wired AND at output"""
 
-        self.insertNOT(x+0*pitch,y, netin1, netout)
-        self.insertNOT(x+1*pitch,y, netin2, netout)
+    #     self.insertNOT(x+0*pitch,y, netin1, netout)
+    #     self.insertNOT(x+1*pitch,y, netin2, netout)
 
     def insertNOT(self,x, y, netin, netout, cellname="void"):
         """Insert RTL inverter at position x,y
@@ -133,14 +133,14 @@ class CellArray():
         for key, val in self.array.items():
             celltype = val[0]
             if celltype == 'NOT':
-                pcb.insertNOT(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],key)
+                board.insertNOT(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],key)
             elif celltype == 'EMPTY':
                 pass
             elif celltype == 'IO':
-                pcb.insertIO(val[3]*pitchx,val[2]*pitchy,val[4][0],str(val[4][0]))
+                board.insertIO(val[3]*pitchx,val[2]*pitchy,val[4][0],str(val[4][0]))
                 pass
             else:
-                print("Failed to insert cell {0}\t".format(key), end="")
+                print("Failed to insert footprint of cell {0}, type unknown\t".format(key), end="")
                 print(celltype)
 
     # Print array content
@@ -241,19 +241,33 @@ class CellArray():
             print("Net not found!")
             return
         cells = self.nets[netname][1]
-        lastcell = cells[-1]
-        segments = []
-        for currentcell in cells:
-            lenx = self.array[currentcell][2] -  self.array[lastcell][2]
-            leny = self.array[currentcell][3] -  self.array[lastcell][3]
-            # len = abs(lenx)  + abs(leny)  # manhattan distance
-            len = abs(lenx) *3 + abs(leny)  # force routing channels
-            lastcell = currentcell
-            segments.append(len)
-        segments.sort()
-        netlength=sum(segments[:-1])  # longest segment is discarded
 
-        self.nets[netname][0] = netlength
+        if True:                     # Use half perimeter wirelength algorithm (HPWL)
+            xmin, xmax = self.SizeX, 0                
+            ymin, ymax = self.SizeY, 0                
+
+            for currentcell in cells:
+                xmin = xmin if self.array[currentcell][2]>xmin else self.array[currentcell][2]
+                xmax = xmax if self.array[currentcell][2]<xmax else self.array[currentcell][2]
+                ymin = ymin if self.array[currentcell][3]>ymin else self.array[currentcell][3]
+                ymax = ymax if self.array[currentcell][3]<ymax else self.array[currentcell][3]
+
+            netlength=2*(xmax-xmin)+ymax-ymin 
+            self.nets[netname][0] = netlength
+        else:                       # old algorithm, manhattan spanning tree
+            lastcell = cells[-1]        
+            segments = []
+            for currentcell in cells:
+                lenx = self.array[currentcell][2] -  self.array[lastcell][2]
+                leny = self.array[currentcell][3] -  self.array[lastcell][3]
+                # len = abs(lenx)  + abs(leny)  # manhattan distance
+                len = abs(lenx) *3 + abs(leny)  # force routing channels
+                lastcell = currentcell
+                segments.append(len)
+            segments.sort()
+            netlength=sum(segments[:-1])  # longest segment is discarded
+
+            self.nets[netname][0] = netlength
 
     # Swap two cells and update the net length selectively
     def swapcells(self, cell1, cell2):
@@ -304,7 +318,7 @@ class CellArray():
 
 subckt = ""
 
-startarray = CellArray(8,16)
+startarray = CellArray(24,48)
 # startarray = CellArray(16,16)
 
 with open("209_synthesized_output.sp", "r") as file:
@@ -419,7 +433,8 @@ print("Final length:", array_opt.totallength)
 pdframe = array_opt.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')
 print(pltdata)
-
+pltdata = pdframe.pivot('Y','X','Nets')
+print(pltdata)
 
 print("Outputting board...")
 pcb = PCBPlacer("../30_PLACE/board_template.brd")
