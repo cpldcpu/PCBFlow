@@ -187,7 +187,9 @@ class CellArray():
                 board.insertNOT(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],key)
             elif celltype == 'NOTtap':
                 board.insertNOTtap(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
-            elif celltype == 'TBUF':
+            elif celltype == 'TBUF':    # TBUF as part of latch
+                board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
+            elif celltype == '__TBUF_':   # TBUF as synthesized by Yosys
                 board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
             elif celltype == 'EMPTY':
                 pass
@@ -380,8 +382,8 @@ class CellArray():
 
 subckt = ""
 
-startarray = CellArray(7,16)
-#startarray = CellArray(24,48)
+# startarray = CellArray(7,16)
+startarray = CellArray(24,48)
 # startarray = CellArray(16,16)
 
 with open("209_synthesized_output.sp", "r") as file:
@@ -470,7 +472,7 @@ print("Fine optimization")
 
 random.seed(1)
 temp = 1
-for _ in range (10000):
+for _ in range (20000):
     # array_opt.optimizerandomexchange(100)
     array_opt.optimizesimulatedannealing(100,temp)
     array_opt.rebuildnets()
