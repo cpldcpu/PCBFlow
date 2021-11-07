@@ -7,6 +7,8 @@
 
 import random
 import time
+import sys
+import math
 # import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
@@ -158,6 +160,9 @@ class PCBPlacer():
             print(e.tag)
             print(e.get('name'), e.get('value'))
 
+class CAParsingError(Exception):
+    pass
+
 class CellArray():
     def __init__(self, SizeX=0, SizeY=0 ):
         self.array = {} # Dictionariy of cells
@@ -185,7 +190,7 @@ class CellArray():
             celltype = val[0]
             if celltype == 'NOT':
                 board.insertNOT(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],key)
-            elif celltype == 'NOTtap':
+            elif celltype == 'NOTb':
                 board.insertNOTtap(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
             elif celltype == 'TBUF':    # TBUF as part of latch
                 board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
@@ -225,7 +230,7 @@ class CellArray():
                 del self.array[key]
                 self.array["IO"+str(val[2])] = ['IO', False, val[2], val[3], [net]]
                 return  
-        print("Could not insert I/O cell!")
+        raise CAParsingError("Could not insert I/O cell in line zero! Please increase the X-width of the cell array.")
 
     # Add logic cell (subckt starting with X)
     def addlogiccell(self,name,celltype, nets):
@@ -252,7 +257,7 @@ class CellArray():
             self.addlogiccell(name+"X3","NOR2", [name+"X1o", name+"X2o", nets[2]   ])  # X3: X1o,X2o,Q
         elif celltype == "LATCH3Tn":  # pin order: E, D, Q
             self.addlogiccell(name+"X1","TBUF"  , [nets[0]   , nets[1]   , name+"X1o" ])   
-            self.addlogiccell(name+"X2","NOTtap", [name+"X3o", name+"X1o", nets[2]    ])
+            self.addlogiccell(name+"X2","NOTb"  , [name+"X3o", name+"X1o", nets[2]    ])
             self.addlogiccell(name+"X3","NOT"   , [nets[2]   , name+"X3o"             ])    
         else:
             self.insertcell(name,celltype, nets)
@@ -263,8 +268,8 @@ class CellArray():
 #                print(name,nets)
                 del self.array[key]
                 self.array[name] = [celltype, True, val[2], val[3], nets]
-                return  
-        print("Could not insert logic cell!")
+                return
+        raise CAParsingError("Cell array size too small for design! Increase number of cells.")
 
     # Add voltage source (V). These are used to shunt internal
     # signals to other signal. We will remove an internal signal for simplification
@@ -380,129 +385,183 @@ class CellArray():
             if delta > 0 and random.random() > np.exp(-delta / temperature):
                 self.swapcells(cell1,cell2)
 
-subckt = ""
 
-# startarray = CellArray(7,16)
-startarray = CellArray(24,48)
-# startarray = CellArray(16,16)
+def parsesptocellarray(filename, startarray ):
+    """ Parse a spice netlist given as file to a CellArray structure    
+    filename = name of spice netlist
+    inputarray = CellArray 
+    """
+    subckt = ""
+    with open(filename, "r") as file:
+    # with open("synth.sp", "r") as file:
+        for line in file:
+            try:
+                words=line.split()
+                if len(words) < 1:
+                    continue
+                if words[0] == ".SUBCKT":
+                    subckt = words[1]
+                    ports =  words[2:]
+                    startarray.addiocell("VCC")
+                    for net in ports:
+                        startarray.addiocell(net)
+                    startarray.addiocell("GND")
+                elif words[0] == ".ENDS":
+                    subckt = ""
+                elif words[0][0] == "X":
+                    if subckt == "":                    
+                        raise CAParsingError("component outside of subckt")
+                    else:     
+                        startarray.addlogiccell(words[0],words[-1],words[1:-1])
+                elif words[0][0] == "V":
+                    if subckt == "":
+                        raise CAParsingError("component outside of subckt")
+                    elif words[-1] != "0" and words[-2] != DC:
+                        raise CAParsingError("Voltage source is not a shunt!")
+                    else:
+                        startarray.addshunt(words[1],words[2])
+            except CAParsingError as errtype:
+                print("Exception during parsing of input file '{0}'".format(filename))
+                print("Conflicting line: '{0}'".format(line.strip()))
+                print("Exception message:",errtype)
+                exit()
 
-with open("209_synthesized_output.sp", "r") as file:
-# with open("synth.sp", "r") as file:
-    for line in file:
-        words=line.split()
-        if len(words) < 1:
-            continue
-        if words[0] == ".SUBCKT":
-            subckt = words[1]
-            ports =  words[2:]
-            startarray.addiocell("VCC")
-            for net in ports:
-                startarray.addiocell(net)
-            startarray.addiocell("GND")
-        elif words[0] == ".ENDS":
-            subckt = ""
-        elif words[0][0] == "X":
-            if subckt == "":
-                print("component outside of subckt", line)
-                break
-            else:     
-                startarray.addlogiccell(words[0],words[-1],words[1:-1])
-        elif words[0][0] == "V":
-            if subckt == "":
-                print("component outside of subckt", line)
-                break
-            elif words[-1] != "0" and words[-2] != DC:
-                print("Voltage source is not a shunt!")
-                break
-            else:
-                startarray.addshunt(words[1],words[2])
+def coarseoptimization(startarray, attempts=20, initialtemp=1000, coolingrate=0.95, optimizationcycles = 1000):
+    """ Perform initial optimization on the array. 
+    Several attempts with different random seeds are started, the best results is returned.
 
-# Cells.printarray()
+    startarray         = populated input array
+    attempts           =  number of different random seeds that are tried
+    initialtemp        = starting temperature for the simulated annealing process
+    coolingrate        = cooling-rate during simulated annealing
+    optimizationcycles = the number of simulated annealing steps (times 100) that are performed for each random seed
+    """
+
+    coarseattempts = []
+
+    for i in range(attempts): # 20 coarse attempts
+        array=CellArray()
+        array.clone(startarray)
+
+        random.seed(i)
+        print("\rAttempt: {0}/{1}".format(i+1,attempts),end='')
+        sys.stdout.flush()
+        temp = initialtemp
+        for _ in range (optimizationcycles):
+            array.optimizesimulatedannealing(100,temp)
+            temp *=coolingrate
+        coarseattempts.append(array)
+    print()
+
+    ordered = sorted(coarseattempts, key=lambda item: item.totallength)
+
+    print("Candidate length:",end='')
+    for len in ordered:
+        print(" ",len.totallength,end='')
+    print("\n")
+
+    array_opt = ordered[0]
+    return array_opt
+
+def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizationcycles = 20000):
+    """ Perform detatiled optimization on the array. 
+
+    startarray         = populated input array
+    initialtemp        = starting temperature for the simulated annealing process
+    coolingrate        = cooling-rate during simulated annealing
+    optimizationcycles = the number of simulated annealing steps (times 100) that are performed 
+    """
+
+    random.seed(1)
+    temp = initialtemp
+    print()
+    for i in range (optimizationcycles):
+        array_opt.optimizesimulatedannealing(100,temp)
+        temp *=coolingrate
+        if (i%(optimizationcycles/20)==0):
+            print("\rCompletion: {0:3.1f}%".format(100*i/optimizationcycles),end='')
+            sys.stdout.flush()
+    print("\rCompletion: {0:3.1f}%\n".format(100))
+
+    return startarray
+
+# ====================================================================
+# Configuration area. Will be turned into commandline settings later
+# ====================================================================
+
+# !!! You need to update the lines below to adjust for your design!!! 
+
+ArrayXwidth = 7         # This is the width of the grid and should be equal to or larger than the number of I/O pins!
+DesignArea = 41         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+
+# Optimizer settings. Only change when needed
+
+AreaMargin = 0.3        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
+                        # Too large values will result in waste of area.
+CoarseAttempts = 20
+CoarseCycles = 1000
+FineCycles = 20000  # Increase to improve larger designs. 
+
+# File names. Don't touch unless you want to modify the flow
+
+InputFileName = "209_synthesized_output.sp"
+PCBTemplateFile = "../30_PLACE/board_template.brd" 
+PCBOutputFile = "309_board_output.brd"
+
+# =========== START OF MAIN ===============================
+
+
+print("=== Setting up empty array ===\n")
+
+startarray = CellArray(ArrayXwidth,1+int(math.ceil(DesignArea*(1+AreaMargin)/ArrayXwidth)))
+
+print("Number of cells in design: {0}\nArea margin: {1}%".format(DesignArea,AreaMargin*100))
+print("Array Xwidth: {0}\nArray Ywidth: {1}\n".format(startarray.SizeX, startarray.SizeY))
+
+parsesptocellarray(InputFileName,startarray)
 startarray.rebuildnets()
-start = time.time()
 
 pdframe = startarray.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')
+print("=== Parsing of input file successful ===\n")
+print("Initial net-length:", startarray.totallength)
 print(pltdata)
-
-
-print("Initial length:", startarray.totallength)
-
-progress = []
-temps = []
-
-
-
-# Coarse optimization
-
-print("Coarse optimization, picking main candidate")
-
-coarseattempts = []
-
-for i in range(20): # 20 coarse attempts
-    array=CellArray()
-    array.clone(startarray)
-
-    random.seed(i)
-    print(i)
-
-    temp = 1000
-    for _ in range (1000):
-    # Cells.optimizerandomexchange(100)
-        array.optimizesimulatedannealing(100,temp)
-        array.rebuildnets()
-        temp *=0.95
-    coarseattempts.append(array)
-
-ordered = sorted(coarseattempts, key=lambda item: item.totallength)
-
-for len in ordered:
-    print(" ",len.totallength,end='')
 print()
 
-# for len in coarseattempts:
-#     print(" ",len.totallength,end='')
-# print()
+print("=== Coarse optimization, picking main candidate ===\n")
 
-array_opt = ordered[0]
-array_opt.rebuildnets()
+start = time.time()
+array_opt=coarseoptimization(startarray, attempts=CoarseAttempts, optimizationcycles=CoarseCycles)
+array_opt.rebuildnets()  # just to be sure
+end = time.time()
+print("Elapsed time: {0:6.3f}s\n".format(end-start))
+
+print("=== Detailed optimization ===\n")
 
 print("Initial length:", array_opt.totallength)
-print("Fine optimization")
 
-random.seed(1)
-temp = 1
-for _ in range (20000):
-    # array_opt.optimizerandomexchange(100)
-    array_opt.optimizesimulatedannealing(100,temp)
-    array_opt.rebuildnets()
-    progress.append(array_opt.totallength)
-    temps.append(temp)
-    temp *=0.95
+start = time.time()
+array_opt=detailedoptimization(array_opt, optimizationcycles=FineCycles)
+array_opt.rebuildnets()  # just to be sure
 end = time.time()
-# plt.subplot(311)
-# plt.semilogx(progress)
-# plt.grid()
-# plt.subplot(312)
-# plt.semilogx(temps)
-# plt.grid()
-# plt.subplot(313)
-# plt.plot(temps,progress)
-# plt.grid()
-print("Elapsed time:", end-start)
-print("after 100 iterations", progress[100])
-# print("after 1000 iterations", progress[1000])
+
 print("Final length:", array_opt.totallength)
+print("Elapsed time: {0:6.3f}s".format(end-start))
+print()
 # array_opt.printarray()
+
+print("=== Final Placement ===\n")
 
 pdframe = array_opt.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')
 print(pltdata)
+
+print("\n=== Final Nets ===\n")
+
 pltdata = pdframe.pivot('Y','X','Nets')
 print(pltdata)
 
-print("Outputting board...")
-pcb = PCBPlacer("../30_PLACE/board_template.brd")
+print("\n=== Writing Footprints to File ===\n")
+pcb = PCBPlacer(PCBTemplateFile)
 array_opt.outputtoboard(pcb)
-pcb.saveeagle("309_board_output.brd")
-
+pcb.saveeagle(PCBOutputFile)
