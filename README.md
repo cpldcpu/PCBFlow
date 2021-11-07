@@ -1,6 +1,6 @@
 # PCBFlow
 
-Highly experimental set of scripts to transform a digital circuit described in a hardware description language (VHDL or Verilog) into a discrete transistor circuit on a PCB. (Disclaimer: I don't know what I am doing)
+Highly experimental set of scripts and a placement tool written in Python that transform a digital circuit described in a hardware description language (VHDL or Verilog) into a discrete transistor circuit on a PCB. (Disclaimer: I don't know what I am doing)
 
 Makes use of:
 -   GHDL
