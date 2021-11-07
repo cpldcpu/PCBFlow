@@ -1,15 +1,14 @@
-# PCBPlace v0.2a
-# 21-Nov-1 cpldcpu
+# PCBPlace v0.21a
+# 21-Nov-7 cpldcpu
 #
 # Very hacky early state, in urgent need of refactoring
 
-# Needs: matplotlib, pandas, lxml
+# Needs: numpy, pandas, lxml
 
 import random
 import time
 import sys
 import math
-# import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
 import pandas as pd
@@ -115,9 +114,17 @@ class PCBPlacer():
 
         n_elements = self.n_board.find('elements')
         n_iopin = et.SubElement(n_elements, 'element', name = "E"+str(self.devcounter), library="RTL_components", package="1X01", value=name, x=str(x), y=str(y+2.54))
-        et.SubElement(n_iopin, 'attribute', name= 'VALUE', x=str(x - 1.27), y=str(y), size="1.27", layer="27")
+#        et.SubElement(n_iopin, 'attribute', name= 'VALUE', x=str(x - 1.27), y=str(y), size="1.27", layer="27") # adds name to document layer
         self.addcontact(netin , "E"+str(self.devcounter), "1" )
         self.devcounter += 1
+
+        # Add pin name to tPlace layer so it shows up on the silk screen
+        n_plain = self.n_board.find('plain')
+        if n_plain == None:
+            n_plain = et.SubElement(self.n_board, 'plain')
+
+        n_text = et.SubElement(n_plain, 'text', layer='21', size='1.27', x=str(x-1.27), y=str(y-0.5))
+        n_text.text = name
 
 
     def printboard(self):
@@ -254,7 +261,7 @@ class CellArray():
                     break
                 if net2 in val[4]:
                     break
-        for key, val in self.array.items():
+        for key, val in self.array.items():     # TODO: #1 Introduce handling of shunting more than one I/O pin to internal net
             if val[0] == 'EMPTY':
                  continue
             self.array[key][4] = [replacewith if net==replacenet else net for net in val[4]]
@@ -460,7 +467,7 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins!
+ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
 DesignArea = 41         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
 
 # Optimizer settings. Only change when needed
@@ -468,8 +475,8 @@ DesignArea = 41         # This is the number of unit cells required for the desi
 AreaMargin = 0.3        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
                         # Too large values will result in waste of area.
 CoarseAttempts = 20
-CoarseCycles = 1000
-FineCycles = 10000  # Increase to improve larger designs. 
+CoarseCycles   = 1000
+FineCycles     = 10000  # Increase to improve larger designs. 
 
 # File names. Don't touch unless you want to modify the flow
 
