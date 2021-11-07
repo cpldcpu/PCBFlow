@@ -51,46 +51,15 @@ class PCBPlacer():
             n_signet = et.SubElement(n_signals, 'signal', name = signal)
             et.SubElement(n_signet, 'contactref', element = element, pad = pad)
 
-
-    # def insertNOR3(self,x, y, netin1, netin2, netin3, netout, pitch=3.8):
-    #     """Insert NOR3 at position x,y
-    #     Assumes inverters that can be combined to wired AND at output"""
-
-    #     self.insertNOT(x+0*pitch,y, netin1, netout)
-    #     self.insertNOT(x+1*pitch,y, netin2, netout)
-    #     self.insertNOT(x+2*pitch,y, netin3, netout)
-
-    # def insertNOR2(self,x, y, netin1, netin2, netout, pitch=3.8):
-    #     """Insert NOR2 at position x,y
-    #     Assumes inverters that can be combined to wired AND at output"""
-
-    #     self.insertNOT(x+0*pitch,y, netin1, netout)
-    #     self.insertNOT(x+1*pitch,y, netin2, netout)
-
     def insertNOT(self,x, y, netin, netout, cellname="void"):
         """Insert RTL inverter at position x,y
         Assumes standard library with transistor and resistor
         supply nets are VCC and GND."""
 
-        n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="RTL_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
-        et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="RTL_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
-        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="RTL_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
-
-        self.addcontact('GND' , "Q"+cellname, "2" )
-        self.addcontact('VCC' , "Rl"+cellname, "2" )
-     
-        self.addcontact(netin , "Rl"+cellname, "1" )
-        self.addcontact(netin , "Rb"+cellname, "1" )
-
-        self.addcontact(netout , "Q"+cellname, "3")
-
-        self.addcontact("B$" + str(self.devcounter), "Q"+cellname, "1")
-        self.addcontact("B$" + str(self.devcounter), "Rb"+cellname, "2")
-
+        self.insertNOTb(x,y,netin, "B$" + str(self.devcounter), netout, cellname)
         self.devcounter += 1
 
-    def insertNOTtap(self,x, y, netin, netbase, netout, cellname="void"):
+    def insertNOTb(self,x, y, netin, netbase, netout, cellname="void"):
         """Insert RTL inverter with base tap at position x,y
         Assumes standard library with transistor and resistor
         supply nets are VCC and GND."""
@@ -191,7 +160,7 @@ class CellArray():
             if celltype == 'NOT':
                 board.insertNOT(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],key)
             elif celltype == 'NOTb':
-                board.insertNOTtap(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
+                board.insertNOTb(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
             elif celltype == 'TBUF':    # TBUF as part of latch
                 board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
             elif celltype == '__TBUF_':   # TBUF as synthesized by Yosys
@@ -455,7 +424,7 @@ def coarseoptimization(startarray, attempts=20, initialtemp=1000, coolingrate=0.
 
     ordered = sorted(coarseattempts, key=lambda item: item.totallength)
 
-    print("Candidate length:",end='')
+    print("Candidate lengths:",end='')
     for len in ordered:
         print(" ",len.totallength,end='')
     print("\n")
@@ -491,7 +460,7 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 7         # This is the width of the grid and should be equal to or larger than the number of I/O pins!
+ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins!
 DesignArea = 41         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
 
 # Optimizer settings. Only change when needed
@@ -500,7 +469,7 @@ AreaMargin = 0.3        # This is additional area that is reserved for empty cel
                         # Too large values will result in waste of area.
 CoarseAttempts = 20
 CoarseCycles = 1000
-FineCycles = 20000  # Increase to improve larger designs. 
+FineCycles = 10000  # Increase to improve larger designs. 
 
 # File names. Don't touch unless you want to modify the flow
 
@@ -511,7 +480,7 @@ PCBOutputFile = "309_board_output.brd"
 # =========== START OF MAIN ===============================
 
 
-print("=== Setting up empty array ===\n")
+print("=== Setting up array ===\n")
 
 startarray = CellArray(ArrayXwidth,1+int(math.ceil(DesignArea*(1+AreaMargin)/ArrayXwidth)))
 
@@ -520,9 +489,9 @@ print("Array Xwidth: {0}\nArray Ywidth: {1}\n".format(startarray.SizeX, startarr
 
 parsesptocellarray(InputFileName,startarray)
 startarray.rebuildnets()
-
 pdframe = startarray.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')
+
 print("=== Parsing of input file successful ===\n")
 print("Initial net-length:", startarray.totallength)
 print(pltdata)
