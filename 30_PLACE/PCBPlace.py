@@ -170,8 +170,8 @@ class CellArray():
                 board.insertNOTb(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
             elif celltype == 'TBUF':    # TBUF as part of latch
                 board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
-            elif celltype == '__TBUF_':   # TBUF as synthesized by Yosys
-                board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
+ #           elif celltype == '__TBUF_':   # TBUF as synthesized by Yosys - TODO: double check pin assignment!
+ #               board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
             elif celltype == 'EMPTY':
                 pass
             elif celltype == 'IO':
@@ -392,7 +392,7 @@ def parsesptocellarray(filename, startarray ):
                 elif words[0][0] == "V":
                     if subckt == "":
                         raise CAParsingError("component outside of subckt")
-                    elif words[-1] != "0" and words[-2] != DC:
+                    elif words[-1] != "0" and words[-2] != "DC":
                         raise CAParsingError("Voltage source is not a shunt!")
                     else:
                         startarray.addshunt(words[1],words[2])
