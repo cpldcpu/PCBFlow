@@ -44,11 +44,13 @@ class PCBPlacer():
         n_signals = self.n_board.find('signals')
         n_signet = n_signals.find("signal[@name='{0}']".format(signal))
 
-        if n_signet != None:
-            et.SubElement(n_signet, 'contactref', element = element, pad = pad)
-        else:
+        if n_signet == None:  # Signal does not exist yet
             n_signet = et.SubElement(n_signals, 'signal', name = signal)
-            et.SubElement(n_signet, 'contactref', element = element, pad = pad)
+
+            if signal=="VCC" or signal=="GND":   
+                n_signet.set("class","1")   # Define as power net
+
+        et.SubElement(n_signet, 'contactref', element = element, pad = pad)
 
     def insertNOT(self,x, y, netin, netout, cellname="void"):
         """Insert RTL inverter at position x,y
@@ -209,6 +211,7 @@ class CellArray():
         raise CAParsingError("Could not insert I/O cell in line zero! Please increase the X-width of the cell array.")
 
     # Add logic cell (subckt starting with X)
+    # Complex cells are recursively broken down into less complex cells
     def addlogiccell(self,name,celltype, nets):
 
         if celltype == "NOR2":
@@ -245,7 +248,7 @@ class CellArray():
                 del self.array[key]
                 self.array[name] = [celltype, True, val[2], val[3], nets]
                 return
-        raise CAParsingError("Cell array size too small for design! Increase number of cells.")
+        raise CAParsingError("Failure to insert Cell. Cell array size too small for design! Increase number of cells.")
 
     # Add voltage source (V). These are used to shunt internal
     # signals to other signal. We will remove an internal signal for simplification
