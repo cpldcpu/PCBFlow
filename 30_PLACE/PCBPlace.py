@@ -1,5 +1,5 @@
-# PCBPlace v0.21a
-# 21-Nov-7 cpldcpu
+# PCBPlace v0.22a
+# 21-Nov-9 cpldcpu
 #
 # Very hacky early state, in urgent need of refactoring
 
@@ -108,7 +108,22 @@ class PCBPlacer():
         self.addcontact("B$" + str(self.devcounter), "Q"+cellname, "1")
         self.addcontact("B$" + str(self.devcounter), "Rb"+cellname, "2")
 
-        self.devcounter += 1
+        self.devcounter += 1        
+
+    def insertAMUX(self,x, y, netB1, netB2, netS, netout, cellname=""):
+        """Insert analog multiplexer 74LVC1G3157
+        Assumes standard library, supply nets VCC and GND."""
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="RTL_components", package="SC70-6", value="74LVC1G3157", x=str(x+1.65), y=str(y+1.4))
+
+        self.addcontact(netB2  , "Q"+cellname, "1" )
+        self.addcontact('GND'  , "Q"+cellname, "2" )
+        self.addcontact(netB1  , "Q"+cellname, "3" )
+        self.addcontact(netout , "Q"+cellname, "4" )
+        self.addcontact('VCC'  , "Q"+cellname, "5" )
+        self.addcontact(netS   , "Q"+cellname, "6" )
+
 
 
     def insertIO(self,x, y, netin, name =""):
@@ -166,6 +181,7 @@ class CellArray():
      
         for key, val in self.array.items():
             celltype = val[0]
+        ## RTL cells            
             if celltype == 'NOT':
                 board.insertNOT(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],key)
             elif celltype == 'NOTb':
@@ -174,8 +190,13 @@ class CellArray():
                 board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
  #           elif celltype == '__TBUF_':   # TBUF as synthesized by Yosys - TODO: double check pin assignment!
  #               board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
+        ## Amux logic cells
+        # insertAMUX(self,x, y, netB1, netB2,  netS, netout, cellname=""):
+            elif celltype == 'AMUX':
+                board.insertAMUX(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],val[4][3],key)
+        ## Generic cells
             elif celltype == 'EMPTY':
-                pass
+                pass            
             elif celltype == 'IO':
                 board.insertIO(val[3]*pitchx,val[2]*pitchy,val[4][0],str(val[4][0]))
             else:
@@ -214,6 +235,7 @@ class CellArray():
     # Complex cells are recursively broken down into less complex cells
     def addlogiccell(self,name,celltype, nets):
 
+        # RTL cells
         if celltype == "NOR2":
             self.insertcell(name+"a","NOT", [nets[0], nets[2]])
             self.insertcell(name+"b","NOT", [nets[1], nets[2]])
@@ -238,6 +260,26 @@ class CellArray():
             self.addlogiccell(name+"X1","TBUF"  , [nets[0]   , nets[1]   , name+"X1o" ])   
             self.addlogiccell(name+"X2","NOTb"  , [name+"X3o", name+"X1o", nets[2]    ])
             self.addlogiccell(name+"X3","NOT"   , [nets[2]   , name+"X3o"             ])    
+        # AMUX cells
+        # insertAMUX(self,x, y, netB1, netB2,  netS, netout, cellname=""):
+        elif celltype == "am_NOT":
+            self.insertcell(name+"" ,"AMUX", ['VCC'   , 'GND'   , nets[0] , nets[1] ])
+        elif celltype == "am_AND2":
+            self.insertcell(name+"" ,"AMUX", ['GND'   , nets[1] , nets[0] , nets[2] ])
+        elif celltype == "am_OR2":
+            self.insertcell(name+"" ,"AMUX", [nets[1] , 'VCC'   , nets[0] , nets[2] ])
+        elif celltype == "am_MUX2":
+            self.insertcell(name+"" ,"AMUX", [nets[0] , nets[1] , nets[2] , nets[3] ])
+        elif celltype == "am_XOR2":
+            self.addlogiccell(name+"a","am_NOT", [nets[1] , name+"Bn"])   
+            self.insertcell  (name+"b","AMUX"  , [nets[1] , name+"Bn" , nets[0] , nets[2] ])
+        elif celltype == "am_DFF":
+            self.addlogiccell(name+"c","am_NOT",   [nets[0], name+"CI"])   # clock inversion
+            self.addlogiccell(name+"a","am_LATCH", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
+            self.addlogiccell(name+"b","am_LATCH", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
+        elif celltype == "am_LATCH":
+            self.insertcell(name+"a" ,"AMUX", [nets[2] , nets[1] , nets[0]    , name+"X1o" ])
+            self.insertcell(name+"b" ,"AMUX", [ 'VCC'  , 'GND'   , name+"X1o" , nets[2]    ])
         else:
             self.insertcell(name,celltype, nets)
 
@@ -481,6 +523,11 @@ CoarseAttempts = 20
 CoarseCycles   = 1000
 FineCycles     = 10000  # Increase to improve larger designs. 
 
+# Pitch of grid on PCB in mm
+
+PCBPitchx = 5 # default 5
+PCBPitchy = 7 # default 7
+
 # File names. Don't touch unless you want to modify the flow
 
 InputFileName = "209_synthesized_output.sp"
@@ -542,5 +589,5 @@ print(pltdata)
 
 print("\n=== Writing Footprints to File ===\n")
 pcb = PCBPlacer(PCBTemplateFile)
-array_opt.outputtoboard(pcb)
+array_opt.outputtoboard(pcb, pitchx = PCBPitchx, pitchy = PCBPitchy )
 pcb.saveeagle(PCBOutputFile)
