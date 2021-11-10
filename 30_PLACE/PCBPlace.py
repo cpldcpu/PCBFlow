@@ -124,7 +124,33 @@ class PCBPlacer():
         self.addcontact('VCC'  , "Q"+cellname, "5" )
         self.addcontact(netS   , "Q"+cellname, "6" )
 
+    def insert1G57(self,x, y, netina, netinb, netinc, netout, cellname=""):
+        """Insert multifunction gate 74LVC1G57
+        Assumes standard library, supply nets VCC and GND."""
 
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G57", x=str(x+1.65), y=str(y+1.4))
+
+        self.addcontact(netinb , "Q"+cellname, "1" )
+        self.addcontact('GND'  , "Q"+cellname, "2" )
+        self.addcontact(netina , "Q"+cellname, "3" )
+        self.addcontact(netout , "Q"+cellname, "4" )
+        self.addcontact('VCC'  , "Q"+cellname, "5" )
+        self.addcontact(netinc , "Q"+cellname, "6" )
+
+    def insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
+        """Insert D-Flipflop 74LVC1G175
+        Assumes standard library, supply nets VCC and GND."""
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G175", x=str(x+1.65), y=str(y+1.4))
+
+        self.addcontact(netclk  , "Q"+cellname, "1" )
+        self.addcontact('GND'   , "Q"+cellname, "2" )
+        self.addcontact(netind  , "Q"+cellname, "3" )
+        self.addcontact(netoutq , "Q"+cellname, "4" )
+        self.addcontact('VCC'   , "Q"+cellname, "5" )
+        self.addcontact(netclrn , "Q"+cellname, "6" )
 
     def insertIO(self,x, y, netin, name =""):
         """Insert I/O pin at position x,y"""
@@ -191,9 +217,15 @@ class CellArray():
  #           elif celltype == '__TBUF_':   # TBUF as synthesized by Yosys - TODO: double check pin assignment!
  #               board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
         ## Amux logic cells
-        # insertAMUX(self,x, y, netB1, netB2,  netS, netout, cellname=""):
             elif celltype == 'AMUX':
                 board.insertAMUX(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],val[4][3],key)
+        ## LVC logic cells
+        #   def insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
+        #   def insert1G57 (self,x, y, netina, netinb, netinc , netout , cellname=""):
+            elif celltype == 'LVC1G175':
+                board.insert1G175(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],val[4][3],key)
+            elif celltype == 'LVC1G57':                
+                board.insert1G57(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],val[4][3],key)
         ## Generic cells
             elif celltype == 'EMPTY':
                 pass            
@@ -280,6 +312,25 @@ class CellArray():
         elif celltype == "am_LATCH":
             self.insertcell(name+"a" ,"AMUX", [nets[2] , nets[1] , nets[0]    , name+"X1o" ])
             self.insertcell(name+"b" ,"AMUX", [ 'VCC'  , 'GND'   , name+"X1o" , nets[2]    ])
+        # LVC cells
+        # insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
+        # insert1G57 (self,x, y, netina, netinb, netinc , netout , cellname=""):
+        elif celltype == "lvc_DFF":
+            self.insertcell(name ,"LVC1G175", [nets[0] , nets[1] , "VCC"   , nets[2] ])
+        elif celltype == "lvc_DFF_clear":
+            self.insertcell(name ,"LVC1G175", [nets[0] , nets[1] , nets[2] , nets[3] ])
+        elif celltype == "lvc_NOT":
+            self.insertcell(name ,"LVC1G57",  [nets[0] , "GND"   , "GND"   , nets[1] ])
+        elif celltype == "lvc_NOR2":
+            self.insertcell(name ,"LVC1G57",  [nets[0] , "GND"   , nets[1] , nets[2] ])
+        elif celltype == "lvc_AND2":
+            self.insertcell(name ,"LVC1G57",  ["VCC"   , nets[0] , nets[1] , nets[2] ])
+        elif celltype == "lvc_SZ57":
+            self.insertcell(name ,"LVC1G57",  [nets[0] , nets[1] , nets[2] , nets[3] ])
+        elif celltype == "lvc_NNAND2":
+            self.insertcell(name ,"LVC1G57",  ["GND"   , nets[0] , nets[1] , nets[2] ])
+        elif celltype == "lvc_XNOR2":
+            self.insertcell(name ,"LVC1G57",  [nets[0] , nets[0] , nets[1] , nets[2] ])
         else:
             self.insertcell(name,celltype, nets)
 

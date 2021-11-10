@@ -1,21 +1,13 @@
 /*
   Basic logic cells for a logic family based on 74LVC1G57 and 74LVC1G175
-  BUF
 
-Logic gates:
-  NOT
-  NOR2
-  NOR3
-
-D-Flop:
-  DFF
 */
 
 
 library(SingleLogicCells) {
   
   cell(BUF) {
-    area: 6;
+    area: 1000;
     pin(A) { direction: input; }
     pin(Y) { direction: output;
               function: "A"; }
