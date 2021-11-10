@@ -1,0 +1,41 @@
+** AMUX behavioral spice model (74LVC1G3157)
+** LTSpice model: tim 2020
+** Netslist adoption: Joan Iluch
+
+
+*****************
+* Connections
+*      1  = B2  (NO)
+*      2  = GND
+*      3  = B1  (NC)
+*      4  = A
+*      5  = VCC
+*      6  = S
+*****************
+
+.SUBCKT 74LVC1G3157 1 2 3 4 5 6
+X1 1 3 4 6 5 2 ANALOG_SPDT
+.ENDS
+
+
+*****************
+* Connections
+*      1  = NO
+*      2  = NC
+*      3  = CO (Common)
+*      4  = SEL
+*      5  = VCC
+*      6  = GND
+*****************
+
+.subckt ANALOG_SPDT 1 2 3 4 5 6
+R0 4 p0 1
+C0 p0 6 2.3p
+R1 2 p1 1
+C1 p1 3 16p
+R2 1 p2 1
+C2 p2 3 16p
+S1 p1 3 5 p0 switch
+S2 p2 3 p0 6 switch
+.model switch sw (vt=2.5 vh=0.2 ron=5 roff=1g)
+.ends ANALOG_SPDT
