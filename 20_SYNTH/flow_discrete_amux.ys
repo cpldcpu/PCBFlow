@@ -1,0 +1,35 @@
+# VHDL to Discrete RT-logic
+
+
+# elaborate VHDL code from GHDL
+ghdl
+hierarchy -check
+
+# Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
+rename -top main
+
+# Draw netlist of elaborated design
+show -format pdf -prefix 200_diagramm_hdl_elaborated
+
+# Insert tristate buffers (ATTENTION: Currently not a supported cell type during P&R)
+tribuf
+
+# Technology mapping
+techmap
+
+proc; opt; fsm; opt; 
+dfflibmap -liberty ../20_SYNTH/discrete_amux_logic_liberty.lib
+abc -liberty ../20_SYNTH/discrete_amux_logic_liberty.lib
+opt_clean
+
+# Print Statistics
+stat -liberty ../20_SYNTH/discrete_amux_logic_liberty.lib
+
+# Draw netlist of optimized and mapped design
+show -format pdf -prefix 208_diagramm_after_mapping
+
+
+# Write out in spice format
+write_spice 209_synthesized_output.sp
+
+

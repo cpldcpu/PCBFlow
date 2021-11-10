@@ -1,0 +1,58 @@
+* Spice library implementing logic gates in analog multiplexer logic
+* 2021-Nov-09  cpldcpu
+
+* Supported gate types:
+* BUF
+* NOT
+* AND2
+* OR2
+* XOR2
+* DLATCH
+* DFF
+
+* Global nodes:
+* VCC       positive supply
+* VEE       negative supply
+
+*****************
+* AMUX Connections
+*      1  = B2  (NO)
+*      2  = GND
+*      3  = B1  (NC)
+*      4  = A
+*      5  = VCC
+*      6  = S
+*****************
+
+.SUBCKT am_NOT A Y
+X1 VEE VEE VCC Y VCC A 74LVC1G3157
+.ENDS 
+
+.SUBCKT am_AND2 A B Y
+X1 B VEE VEE   Y VCC A 74LVC1G3157
+.ENDS 
+
+.SUBCKT am_OR2 A B Y
+X1 VCC VEE B Y VCC A 74LVC1G3157
+.ENDS 
+
+.SUBCKT am_XOR2 A B Y
+X1 N001 VEE B Y VCC A 74LVC1G3157
+X2 B N001 am_NOT
+.ENDS 
+
+.SUBCKT am_MUX2 A B S Y
+X1 A VEE B Y VCC S 74LVC1G3157
+.ENDS 
+
+.SUBCKT am_LATCH E D Q
+X1 D   VEE Q   N001 VCC E    74LVC1G3157
+X2 VCC VEE GND Q    VCC N001 74LVC1G3157
+.ENDS 
+
+.SUBCKT am_DFF C D Q
+X1 nC D t am_LATCH
+X2 C t Q am_LATCH
+X3 C nC am_NOT
+.ENDS 
+

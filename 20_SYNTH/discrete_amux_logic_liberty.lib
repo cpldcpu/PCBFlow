@@ -1,0 +1,80 @@
+/*
+  Basic logic cellsam_ for a logic family based on discrete NPN transistors (Resistor Transistor Logic)
+  BUF
+
+Logic gates:
+  NOT   - 1
+  AND2  - 1
+  XOR2  - 2 
+  OR2   - 1
+
+D-Flop:
+  DFF   - 5
+  Latch - 2
+
+*/
+
+
+library(SingleLogicCells) {
+  
+  cell(am_BUF) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A"; }
+  }
+
+  cell(am_NOT) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A'"; }
+  }
+
+  cell(am_OR2) {
+      area: 2;
+      pin(A) { direction: input; }
+      pin(B) { direction: input; }
+      pin(Y) { direction: output;
+              function: "(A+B)"; }
+    }
+
+  cell(am_AND2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B)"; }
+  }
+
+  cell(am_XOR2) {
+    area: 2;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A^B)"; }
+  }
+
+  cell(am_MUX2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(S) { direction: input; }
+    pin(Y) { direction: output;
+             function: "((A*S)+(B*S'))"; }
+  }
+
+
+  cell(am_DFF) {
+    area: 5;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+
+
+}
