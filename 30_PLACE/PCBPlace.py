@@ -66,9 +66,9 @@ class PCBPlacer():
         supply nets are VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="RTL_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
-        et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="RTL_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
-        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="RTL_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
+        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
 
         self.addcontact('GND' , "Q"+cellname, "2" )
         self.addcontact('VCC' , "Rl"+cellname, "2" )
@@ -89,10 +89,10 @@ class PCBPlacer():
         supply nets are VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="RTL_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
-        et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="RTL_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
-        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="RTL_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
-        et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="RTL_components", package="RES0402", value="RES", x=str(x+3.2), y=str(y+3.4))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
+        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
+        et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+3.2), y=str(y+3.4))
 
         self.addcontact(netout , "Q"+cellname, "2" )
         self.addcontact('VCC' , "Rl"+cellname, "2" )
@@ -115,7 +115,7 @@ class PCBPlacer():
         Assumes standard library, supply nets VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="RTL_components", package="SC70-6", value="74LVC1G3157", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SC70-6", value="74LVC1G3157", x=str(x+1.65), y=str(y+1.4))
 
         self.addcontact(netB2  , "Q"+cellname, "1" )
         self.addcontact('GND'  , "Q"+cellname, "2" )
@@ -130,7 +130,7 @@ class PCBPlacer():
         """Insert I/O pin at position x,y"""
 
         n_elements = self.n_board.find('elements')
-        n_iopin = et.SubElement(n_elements, 'element', name = "E"+str(self.devcounter), library="RTL_components", package="1X01", value=name, x=str(x), y=str(y+2.54))
+        n_iopin = et.SubElement(n_elements, 'element', name = "E"+str(self.devcounter), library="discrete_logic_components", package="1X01", value=name, x=str(x), y=str(y+2.54))
 #        et.SubElement(n_iopin, 'attribute', name= 'VALUE', x=str(x - 1.27), y=str(y), size="1.27", layer="27") # adds name to document layer
         self.addcontact(netin , "E"+str(self.devcounter), "1" )
         self.devcounter += 1

@@ -61,8 +61,8 @@
             <plain>
             </plain>
             <libraries>
-                <library name="RTL_components">
-                    <description>RTL components</description>
+                <library name="discrete_logic_components">
+                    <description>Discrete logic components</description>
                     <packages>
                         <package name="SOT23">
                             <description>&lt;b&gt;SOT23-ren3&lt;/b&gt;&lt;br&gt;
@@ -77,14 +77,13 @@
                             <wire x1="-0.65" y1="0.5" x2="0.3" y2="1.45" width="0.1" layer="51"/>
                         </package>
                         <package name="1X01">
-                            <description>&lt;b&gt;PIN HEADER&lt;/b&gt;</description>
-
+                            <description>Pin Header</description>
                             <pad name="1" x="0" y="0" drill="1.016" shape="octagon"/>
                             <text x="-1.27" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
                             <rectangle x1="-0.254" y1="-0.254" x2="0.254" y2="0.254" layer="51"/>
                         </package>
                         <package name="RES0402">
-                            <description>0402 SMD resistor</description>
+                            <description>0402 SMD Resistor</description>
                             <smd name="1" x="-0.55" y="0" dx="0.75" dy="0.6" layer="1"/>
                             <smd name="2" x="0.55" y="0" dx="0.75" dy="0.6" layer="1"/>
                             <wire x1="-0.5" y1="0.25" x2="0.5" y2="0.25" width="0.1" layer="51"/>
@@ -93,7 +92,7 @@
                             <wire x1="-0.5" y1="-0.25" x2="-0.5" y2="0.25" width="0.1" layer="51"/>
                         </package>
                         <package name="SC70-6">
-                            <description>&lt;b&gt;SC70&lt;/b&gt; - DCK&lt;p&gt;0.65 mm pitch</description>
+                            <description>SC70-6 package, 0.65 mm pitch</description>
                             <wire x1="-1.1" y1="0.6" x2="1.1" y2="0.6" width="0.2032" layer="51"/>
                             <wire x1="1.1" y1="0.6" x2="1.1" y2="-0.6" width="0.2032" layer="21"/>
                             <wire x1="1.1" y1="-0.6" x2="-1.1" y2="-0.6" width="0.2032" layer="51"/>
@@ -111,6 +110,35 @@
                             <rectangle x1="0.5" y1="0.6" x2="0.8" y2="1.1" layer="51"/>
                             <rectangle x1="-0.15" y1="0.6" x2="0.15" y2="1.1" layer="51"/>
                             <rectangle x1="-0.8" y1="0.6" x2="-0.5" y2="1.1" layer="51"/>
+                        </package>
+                        <package name="SOT23-6">
+                            <description>SOT-23-6 package, 0.95 mm pitch</description>
+                            <wire x1="1.4724" y1="0.8104" x2="1.4724" y2="-0.8104" width="0.1778" layer="21"/>
+                            <wire x1="1.4224" y1="-0.8104" x2="-1.4224" y2="-0.8104" width="0.1778" layer="51"/>
+                            <wire x1="-1.4724" y1="-0.8104" x2="-1.4724" y2="0.8104" width="0.1778" layer="21"/>
+                            <wire x1="-1.4224" y1="0.8104" x2="1.4224" y2="0.8104" width="0.1778" layer="51"/>
+                            <circle x="-0.9525" y="-0.2675" radius="0.2245" width="0" layer="21"/>
+                            <smd name="1" x="-0.95" y="-1.3001" dx="0.55" dy="1.2" layer="1"/>
+                            <smd name="2" x="0" y="-1.3001" dx="0.55" dy="1.2" layer="1"/>
+                            <smd name="3" x="0.95" y="-1.3001" dx="0.55" dy="1.2" layer="1"/>
+                            <smd name="4" x="0.95" y="1.3001" dx="0.55" dy="1.2" layer="1"/>
+                            <smd name="6" x="-0.95" y="1.3001" dx="0.55" dy="1.2" layer="1"/>
+                            <smd name="5" x="0" y="1.3001" dx="0.55" dy="1.2" layer="1"/>
+                            <rectangle x1="-1.2" y1="-1.5" x2="-0.7" y2="-0.85" layer="51"/>
+                            <rectangle x1="-0.25" y1="-1.5" x2="0.25" y2="-0.85" layer="51"/>
+                            <rectangle x1="0.7" y1="-1.5" x2="1.2" y2="-0.85" layer="51"/>
+                            <rectangle x1="0.7" y1="0.85" x2="1.2" y2="1.5" layer="51"/>
+                            <rectangle x1="-1.2" y1="0.85" x2="-0.7" y2="1.5" layer="51"/>
+                            <rectangle x1="-0.25" y1="0.85" x2="0.25" y2="1.5" layer="51"/>
+                        </package>
+                        <package name="CAP0402">
+                            <description>0402 SMD Capacitor</description>
+                            <wire x1="0.55" y1="-0.3" x2="-0.55" y2="-0.3" width="0.12" layer="51"/>
+                            <wire x1="-0.55" y1="-0.3" x2="-0.55" y2="0.3" width="0.12" layer="51"/>
+                            <wire x1="-0.55" y1="0.3" x2="0.55" y2="0.3" width="0.12" layer="51"/>
+                            <wire x1="0.55" y1="0.3" x2="0.55" y2="-0.3" width="0.12" layer="51"/>
+                            <smd name="1" x="-0.4846" y="0" dx="0.56" dy="0.6291" layer="1"/>
+                            <smd name="2" x="0.4846" y="0" dx="0.56" dy="0.6291" layer="1"/>
                         </package>
                     </packages>
                 </library>
