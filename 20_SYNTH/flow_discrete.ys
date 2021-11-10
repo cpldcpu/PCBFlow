@@ -1,4 +1,4 @@
-# VHDL to Discrete logic
+# VHDL to Discrete RT-logic
 
 
 # elaborate VHDL code from GHDL
@@ -18,12 +18,12 @@ tribuf
 techmap
 
 proc; opt; fsm; opt; 
-dfflibmap -liberty ../20_SYNTH/discrete_logic_liberty.lib
-abc -liberty ../20_SYNTH/discrete_logic_liberty.lib
+dfflibmap -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib
+abc -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib
 opt_clean
 
 # Print Statistics
-stat -liberty ../20_SYNTH/discrete_logic_liberty.lib
+stat -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib
 
 # Draw netlist of optimized and mapped design
 show -format pdf -prefix 208_diagramm_after_mapping
