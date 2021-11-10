@@ -1,0 +1,96 @@
+/*
+  Basic logic cells for a logic family based on 74LVC1G57 and 74LVC1G175
+  BUF
+
+Logic gates:
+  NOT
+  NOR2
+  NOR3
+
+D-Flop:
+  DFF
+*/
+
+
+library(SingleLogicCells) {
+  
+  cell(BUF) {
+    area: 6;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A"; }
+  }
+  
+  cell(lvc_NOT) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A'"; }
+  }
+
+  cell(lvc_NOR2) {
+    area: 2;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A+B)'"; }
+  }
+  
+  cell(lvc_AND2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B)"; }
+  }
+
+  cell(lvc_SZ57) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(C) { direction: input; }
+    pin(Y) { direction: output;
+             function: "((A'*C')+(B*C))"; }
+  }
+
+  cell(lvc_NNAND2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A'*B)'"; }
+  }
+  
+  cell(lvc_XNOR2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A^B)'"; }
+  }
+
+  cell(lvc_DFF) {
+    area: 1;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+
+    cell(lvc_DFF_clear) {
+    area: 1;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; 
+                  clear:      "CD'";}
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(CD) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+
+}
