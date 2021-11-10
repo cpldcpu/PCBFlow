@@ -449,7 +449,7 @@ def parsesptocellarray(filename, startarray ):
 
 def coarseoptimization(startarray, attempts=20, initialtemp=1000, coolingrate=0.95, optimizationcycles = 1000):
     """ Perform initial optimization on the array. 
-    Several attempts with different random seeds are started, the best results is returned.
+    Several attempts with different random seeds are started, the best result is returned.
 
     startarray         = populated input array
     attempts           =  number of different random seeds that are tried
@@ -485,7 +485,7 @@ def coarseoptimization(startarray, attempts=20, initialtemp=1000, coolingrate=0.
     return array_opt
 
 def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizationcycles = 20000):
-    """ Perform detatiled optimization on the array. 
+    """ Perform detailed optimization on the array. 
 
     startarray         = populated input array
     initialtemp        = starting temperature for the simulated annealing process
