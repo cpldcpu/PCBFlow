@@ -1,0 +1,86 @@
+* Spice library implementing logic gates in discrete resistor-transistor-logic (RTL)
+* 2021-Nov-01  cpldcpu
+
+* General notes:
+* The load resistor in all cells is at the input, the output is open collector.
+* This helps to automatically adjust biasing, but means that an additonal pull-up
+* resistor has to be added to any open output that does not have internal connections.
+
+* Supported gate types:
+* BUF
+* NOT
+* NOR2
+* NOR3
+* DLATCH
+* DFF
+
+* Global nodes:
+* VCC       positive supply
+* VEE       negative supply
+
+* Global constants
+* RL        Load resistor value
+* RB        Base resistor value
+
+* "RTL_NPN" needs to be defined elsewhere and should be a generic NPN switching transistor
+* (e.g. MMBT3904, PMBT2369)
+
+.SUBCKT NOT A Y
+Q1 Y N001 VEE 0 RTL_NPN
+R1 VCC A {RL}
+R2 N001 A {RB}
+.ENDS NOT
+
+.SUBCKT BUF A Y
+X1 A B NOT
+X2 B Y NOT
+.ENDS NOT
+
+.SUBCKT NOR2 A B Y
+X1 A Y NOT
+X2 B Y NOT
+.ENDS NOR2
+
+.SUBCKT NOR3 A B C Y
+X1 A Y NOT
+X2 B Y NOT
+X3 C Y NOT
+.ENDS NOR2
+
+.SUBCKT TBUF E A Y
+Q1 A N001 Y 0 RTL_NPN
+R1 E N001 {RB}
+R2 VCC A {RL}
+R3 VCC E {RL}
+.ENDS NOT
+
+.SUBCKT NOTb A base Y
+Q1 Y base VEE 0 RTL_NPN
+R1 VCC A {RL}
+R2 base A {RB}
+.ENDS NOT
+
+.SUBCKT DLATCH3Tn E D Qn
+X1 E D N001 TBUF
+X2 N002 N001 Qn NOTb
+X3 Qn N002 NOT
+.ENDS DLATCH
+
+.SUBCKT PHLATCH E D Q
+X1 D nE N001 NOR2
+X2 E Q nQ NOR2
+X3 N001 nQ Q NOR2
+X4 E nE NOT
+.ENDS DLATCH
+
+.SUBCKT DFF7T C D Q
+X1 nC D t DLATCH3Tn
+X2 C t Q DLATCH3Tn
+X3 C nC NOT
+.ENDS DFF
+
+.SUBCKT DFF C D Q
+X1 nC D t PHLATCH
+X2 C t Q PHLATCH
+X3 C nC NOT
+.ENDS DFF
