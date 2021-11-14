@@ -29,7 +29,7 @@ library(SingleLogicCells) {
   }
 
   cell(lvc_NOR2) {
-    area: 2;
+    area: 1;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(Y) { direction: output;
@@ -60,7 +60,7 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
              function: "(A'*B)'"; }
   }
-  
+
   cell(lvc_XNOR2) {
     area: 1;
     pin(A) { direction: input; }
