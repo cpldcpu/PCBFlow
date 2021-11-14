@@ -5,5 +5,5 @@ cd ..
 
 echo "Cleaning work directory"
 cd Work/
-rm *
+rm *.cf *.dot *.pdf *.txt *.sp *.o
 cd ..
