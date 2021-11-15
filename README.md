@@ -4,7 +4,7 @@ Highly experimental set of scripts and a placement tool written in Python that t
 
 Makes use of:
 -   GHDL
--   Yosys 
+-   Yosys with GHDL plugin
 -   ABC (Integrated in Yosys)
 -   GTKView
 -   NGspice
