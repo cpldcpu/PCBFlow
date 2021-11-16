@@ -1,0 +1,60 @@
+/*
+  Basic logic cells for a logic family based on discrete NPN transistors (Resistor Transistor Logic)
+  BUF
+
+Logic gates:
+  NOT
+  NAND2
+  NAND3
+
+D-Flop:
+  DFF
+*/
+
+
+library(SingleLogicCells) {
+  
+  cell(BUF) {
+    area: 6;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A"; }
+  }
+  
+  cell(yg_NOT) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A'"; }
+  }
+  
+  cell(yg_NAND2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B)'"; }
+  }
+
+  cell(yg_NAND3) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(C) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B*C)'"; }
+  }
+
+  cell(yg_DFF) {
+    area: 1;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+
+
+}
