@@ -15,8 +15,10 @@ if [ "$1" == "" ]; then
     echo "Technologies:"
     echo "  RT      Bipolar Resistor Transistor Logic (default)"
     echo "  nmos    nmos transistor logic"
+    echo "  hybrid  hybrid nmos/bipolar logic"
     echo "  amux    analog multiplexer logic"
     echo "  74LVC   74LVC single gate logic"
+    echo "  YG      YG strip logic"
     exit 1
 else
     FILE="$1"
@@ -30,13 +32,17 @@ else
 fi
 
 if [ "$APP" == "RT" ]; then
-    echo "Synthesizing to Resistor Transistor Logic"
+    echo "Synthesizing to bipolar resistor transistor logic"
 elif [ "$APP" == "nmos" ]; then
     echo "Synthesizing to nmos transistor logic"
 elif [ "$APP" == "amux" ]; then
     echo "Synthesizing to analog multiplexer logic"
 elif [ "$APP" == "74LVC" ]; then
     echo "Synthesizing to single gate TTL logic (74LVC)"
+elif [ "$APP" == "hybrid" ]; then
+    echo "Synthesizing to hybrid Bipolar/nmos logic"
+elif [ "$APP" == "YG" ]; then
+    echo "Synthesizing to YG strip logic"
 else
     echo "Unknown logic style :$APP"
     exit 1
@@ -48,7 +54,7 @@ fi
 cd Work
 ghdl -a ../10_HDL/$FILE.vhd
 yosys ../20_SYNTH/flow_discrete_$APP.ys >208_log_yosys.txt
-grep -i 'Printing' -A 20 208_log_yosys.txt
+grep -i 'Printing' -A 28 208_log_yosys.txt
 cd ..
 
 # ngspice testbench_rtl.sp 
