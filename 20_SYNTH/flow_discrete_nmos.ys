@@ -12,7 +12,7 @@ rename -top main
 show -format pdf -prefix 200_diagramm_hdl_elaborated
 
 # Insert tristate buffers (ATTENTION: Currently not a supported cell type during P&R)
-#tribuf
+tribuf
 
 # Technology mapping
 techmap
