@@ -13,6 +13,7 @@ import numpy as np
 from copy import deepcopy
 import pandas as pd
 from lxml import etree as et
+from dataclasses import dataclass
 
 
 # load eagle board template, insert gates, output board
@@ -182,6 +183,14 @@ class PCBPlacer():
 class CAParsingError(Exception):
     pass
 
+# Define data structure of cell
+@dataclass
+class Cell:
+    type:        str
+    moveable:    bool
+    x:           int
+    y:           int
+    pin:         list
 class CellArray():
     def __init__(self, SizeX=0, SizeY=0 ):
         self.array = {} # Dictionariy of cells
@@ -190,7 +199,7 @@ class CellArray():
         self.SizeY = SizeY
         for y in range(SizeY):
             for x in range(SizeX):
-                self.array["V"+str(x+SizeX*y)]=['EMPTY',True,x,y,[]]
+                self.array["V"+str(x+SizeX*y)]=Cell('EMPTY',True,x,y,[])
 
     # copy content of another CellArray
     def clone(self, source):
@@ -206,31 +215,32 @@ class CellArray():
         """ Output content of cellarray to pcb"""
      
         for key, val in self.array.items():
-            celltype = val[0]
+            # celltype = val[0]
+            celltype = val.type
         ## RTL cells            
             if celltype == 'NOT':
-                board.insertNOT(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],key)
+                board.insertNOT(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
             elif celltype == 'NOTb':
-                board.insertNOTb(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
+                board.insertNOTb(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
             elif celltype == 'TBUF':    # TBUF as part of latch
-                board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
+                board.insertTBUF(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
  #           elif celltype == '__TBUF_':   # TBUF as synthesized by Yosys - TODO: double check pin assignment!
- #               board.insertTBUF(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],key)
+ #               board.insertTBUF(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
         ## Amux logic cells
             elif celltype == 'AMUX':
-                board.insertAMUX(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],val[4][3],key)
+                board.insertAMUX(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key)
         ## LVC logic cells
         #   def insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
         #   def insert1G57 (self,x, y, netina, netinb, netinc , netout , cellname=""):
             elif celltype == 'LVC1G175':
-                board.insert1G175(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],val[4][3],key)
+                board.insert1G175(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key)
             elif celltype == 'LVC1G57':                
-                board.insert1G57(val[3]*pitchx,val[2]*pitchy,val[4][0],val[4][1],val[4][2],val[4][3],key)
+                board.insert1G57(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key)
         ## Generic cells
             elif celltype == 'EMPTY':
                 pass            
             elif celltype == 'IO':
-                board.insertIO(val[3]*pitchx,val[2]*pitchy,val[4][0],str(val[4][0]))
+                board.insertIO(val.y*pitchx,val.x*pitchy,val.pin[0],str(val.pin[0]))
             else:
                 print("Failed to insert footprint of cell {0}, type unknown\t".format(key), end="")
                 print(celltype)
@@ -256,10 +266,9 @@ class CellArray():
     # I/O cells are added to row 0 by definition for now
     def addiocell(self, net):
         for key, val in self.array.items():
-            if val[0] == "EMPTY" and val[3] == 0:
-#                print(key,net)
+            if val.type == "EMPTY" and val.y == 0:
                 del self.array[key]
-                self.array["IO"+str(val[2])] = ['IO', False, val[2], val[3], [net]]
+                self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
                 return  
         raise CAParsingError("Could not insert I/O cell in line zero! Please increase the X-width of the cell array.")
 
@@ -336,10 +345,10 @@ class CellArray():
 
     def insertcell(self,name,celltype, nets):
         for key, val in self.array.items():
-            if val[0] == "EMPTY" and val[3] > 0:
+            if val.type == "EMPTY" and val.y > 0:
 #                print(name,nets)
                 del self.array[key]
-                self.array[name] = [celltype, True, val[2], val[3], nets]
+                self.array[name] = Cell(celltype, True, val.x, val.y, nets)
                 return
         raise CAParsingError("Failure to insert Cell. Cell array size too small for design! Increase number of cells.")
 
@@ -350,24 +359,25 @@ class CellArray():
         replacenet = net1
         replacewith = net2
         for key, val in self.array.items():
-            if val[0] == 'IO':
-                if net1 in val[4]:
+            if val.type == 'IO':
+                if net1 in val.pin:
                     replacenet = net2
                     replacewith = net1
                     break
-                if net2 in val[4]:
+                if net2 in val.pin:
                     break
         for key, val in self.array.items():     # TODO: #1 Introduce handling of shunting more than one I/O pin to internal net
-            if val[0] == 'EMPTY':
+            if val.type == 'EMPTY':
                  continue
-            self.array[key][4] = [replacewith if net==replacenet else net for net in val[4]]
+            self.array[key].pin = [replacewith if net==replacenet else net for net in val.pin]
 
     # Rebuild list of nets from cellarray
     def rebuildnets(self):
         self.nets = {}
         self.totallength = 0
         for key, val in self.array.items():
-            for newnet in val[4]:
+            # for newnet in val[4]:
+            for newnet in val.pin:
                 if not newnet in self.nets:
                     self.nets[newnet]=[1e6, [key]]
                 else:
@@ -388,10 +398,10 @@ class CellArray():
             ymin, ymax = self.SizeY, 0                
 
             for currentcell in cells:
-                xmin = xmin if self.array[currentcell][2]>xmin else self.array[currentcell][2]
-                xmax = xmax if self.array[currentcell][2]<xmax else self.array[currentcell][2]
-                ymin = ymin if self.array[currentcell][3]>ymin else self.array[currentcell][3]
-                ymax = ymax if self.array[currentcell][3]<ymax else self.array[currentcell][3]
+                xmin = xmin if self.array[currentcell].x>xmin else self.array[currentcell].x
+                xmax = xmax if self.array[currentcell].x<xmax else self.array[currentcell].x
+                ymin = ymin if self.array[currentcell].y>ymin else self.array[currentcell].y
+                ymax = ymax if self.array[currentcell].y<ymax else self.array[currentcell].y
 
             netlength=2*(xmax-xmin)+ymax-ymin 
             self.nets[netname][0] = netlength
@@ -412,18 +422,18 @@ class CellArray():
 
     # Swap two cells and update the net length selectively
     def swapcells(self, cell1, cell2):
-        x1,y1 = self.array[cell1][2:4]
-        x2,y2 = self.array[cell2][2:4]
-        self.array[cell1][2:4] = [x2,y2]
-        self.array[cell2][2:4] = [x1,y1]
+        x1,y1 = [self.array[cell1].x , self.array[cell1].y]
+        x2,y2 = [self.array[cell2].x , self.array[cell2].y]
+        [self.array[cell2].x , self.array[cell2].y] = [x2,y2]
+        [self.array[cell1].x , self.array[cell1].y] = [x1,y1]
         lenbefore=0
         lenafter=0
     
-        for net in self.array[cell1][4]:
+        for net in self.array[cell1].pin:
             lenbefore += self.nets[net][0]
             self.updatenetlength(net)
             lenafter += self.nets[net][0]
-        for net in self.array[cell2][4]:
+        for net in self.array[cell2].pin:
             lenbefore += self.nets[net][0]
             self.updatenetlength(net)
             lenafter += self.nets[net][0]
@@ -447,7 +457,7 @@ class CellArray():
     def optimizesimulatedannealing(self, iterations = 1000, temperature = 1):
         for i in range(iterations):
             cell1, cell2 = random.sample(self.array.keys(),2)
-            if self.array[cell1][1] == False or self.array[cell2][1] == False:
+            if self.array[cell1].moveable == False or self.array[cell2].moveable == False:
                 # Don't exchange fixed cells
                 continue
             oldnetlength = self.totallength
@@ -564,15 +574,15 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 # !!! You need to update the lines below to adjust for your design!!! 
 
 ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea = 41         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+DesignArea = 61         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
 
 # Optimizer settings. Only change when needed
 
 AreaMargin = 0.3        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
                         # Too large values will result in waste of area.
-CoarseAttempts = 20
-CoarseCycles   = 1000
-FineCycles     = 10000  # Increase to improve larger designs. 
+CoarseAttempts = 2      # 20
+CoarseCycles   = 10   # 1000
+FineCycles     = 100  # 10000 Increase to improve larger designs. 
 
 # Pitch of grid on PCB in mm
 
