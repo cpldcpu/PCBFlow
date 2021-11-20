@@ -5,6 +5,9 @@
 ghdl
 hierarchy -check
 
+# Read verilog description of cells
+read_verilog -lib ../20_SYNTH/discrete_RT_logic_cells.v
+
 # Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
 rename -top main
 
@@ -31,5 +34,7 @@ show -format pdf -prefix 208_diagramm_after_mapping
 
 # Write out in spice format
 write_spice 209_synthesized_output.sp
+write_json 209_synthesized_output.json
+
 
 
