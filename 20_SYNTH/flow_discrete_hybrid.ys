@@ -5,6 +5,10 @@
 ghdl
 hierarchy -check
 
+# Read verilog description of cells
+read_verilog -lib ../20_SYNTH/discrete_nmos_logic_cells.v
+read_verilog -lib ../20_SYNTH/discrete_hybrid_logic_cells.v
+
 # Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
 rename -top main
 
@@ -18,8 +22,8 @@ tribuf
 techmap
 
 proc; opt; fsm; opt; 
-dfflibmap -liberty ../20_SYNTH/discrete_hybrid_logic_liberty.lib
-abc -liberty ../20_SYNTH/discrete_hybrid_logic_liberty.lib
+dfflibmap  -liberty ../20_SYNTH/discrete_hybrid_logic_liberty.lib 
+abc  -liberty ../20_SYNTH/discrete_hybrid_logic_liberty.lib 
 opt_clean
 
 # Print Statistics

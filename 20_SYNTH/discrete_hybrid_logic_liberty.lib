@@ -20,8 +20,8 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
               function: "A"; }
   }
-  
-  cell(hy_NOT) {
+ 
+  cell(nm_NOT) {
     area: 1;
     pin(A) { direction: input; }
     pin(Y) { direction: output;
@@ -29,7 +29,7 @@ library(SingleLogicCells) {
   }
 
 
-  cell(hy_NAND2) {
+  cell(nm_NAND2) {
     area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -37,7 +37,7 @@ library(SingleLogicCells) {
              function: "(A*B)'"; }
   }
 
-  cell(hy_NAND3) {
+  cell(nm_NAND3) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -46,7 +46,7 @@ library(SingleLogicCells) {
              function: "(A*B*C)'"; }
   }
 
-  cell(hy_AOI2_2) {
+  cell(nm_AOI2_2) {
     area: 4;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -56,7 +56,7 @@ library(SingleLogicCells) {
              function: "((A*B)+(C*D))'"; }
   }
 
-cell(hy_AOI1_2) {
+cell(nm_AOI1_2) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -64,19 +64,8 @@ cell(hy_AOI1_2) {
     pin(Y) { direction: output;
              function: "(A+(B*C))'"; }
   }
-/*
-cell(hy_AOI1_3) {
-    area: 4;
-    pin(A) { direction: input; }
-    pin(B) { direction: input; }
-    pin(C) { direction: input; }
-    pin(D) { direction: input; }
-    pin(Y) { direction: output;
-             function: "(A+(B*C*D))'"; }
-  }
-*/
 
-  cell(hy_AOI2_2_2) {
+  cell(nm_AOI2_2_2) {
     area: 6;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -87,21 +76,8 @@ cell(hy_AOI1_3) {
     pin(Y) { direction: output;
              function: "((A*B)+(C*D)+(E*F))'"; }
   }
-/*
-  cell(hy_AOI3_3) {
-    area: 6;
-    pin(A) { direction: input; }
-    pin(B) { direction: input; }
-    pin(C) { direction: input; }
-    pin(D) { direction: input; }
-    pin(E) { direction: input; }
-    pin(F) { direction: input; }
-    pin(Y) { direction: output;
-             function: "((A*B*C)+(D*E*F))'"; }
-  }
-*/
 
-  cell(hy_NOR2) {
+  cell(nm_NOR2) {
     area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -109,7 +85,7 @@ cell(hy_AOI1_3) {
              function: "(A+B)'"; }
   }
 
-  cell(hy_NOR3) {
+  cell(nm_NOR3) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
