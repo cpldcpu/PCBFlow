@@ -320,7 +320,7 @@ class CellArray():
             self.addlogiccell(name+"b","am_LATCH", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
         elif celltype == "am_LATCH":
             self.insertcell(name+"a" ,"AMUX", [nets[2] , nets[1] , nets[0]    , name+"X1o" ])
-            self.insertcell(name+"b" ,"AMUX", [ 'VCC'  , 'GND'   , name+"X1o" , nets[2]    ])
+            self.insertcell(name+"b" ,"AMUX", [ 'GND'  , 'VCC'   , name+"X1o" , nets[2]    ])
         # LVC cells
         # insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
         # insert1G57 (self,x, y, netina, netinb, netinc , netout , cellname=""):
