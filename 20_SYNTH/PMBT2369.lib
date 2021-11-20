@@ -1,0 +1,72 @@
+
+* This is the transistor model used to simulate RTL gates
+* It can be changed to implement different transistor types without having to edit all subckt files.
+
+***********************************************************
+*
+* PMBT2369
+*
+* Nexperia
+*
+* General purpose NPN Transistor
+* IC   = 200 mA
+* VCEO = 40 V 
+* hFE  = 40 - 120  @ 1V/10mA
+*
+*
+*
+*
+* Package pinning does not match Spice model pinning.
+* Package: SOT 23
+* 
+* Package Pin 1: Base      
+* Package Pin 2: Emitter        
+* Package Pin 3: Collector 
+*
+*
+* # 
+* Spicemodel does not include temperature dependency
+*
+**********************************************************
+
+.MODEL RTL_NPN NPN
++ IS = 1.751E-15 
++ NF = 0.998 
++ ISE = 3.503E-16 
++ NE = 1.148 
++ BF = 121.3 
++ IKF = 0.17 
++ VAF = 57 
++ NR = 0.988 
++ ISC = 7.44E-11 
++ NC = 1.55 
++ BR = 0.3812 
++ IKR = 0.05 
++ VAR = 17 
++ RB = 35 
++ IRB = 0.0002423 
++ RBM = 0.05 
++ RE = 0.729 
++ RC = 1.01 
++ XTB = 0 
++ EG = 1.11 
++ XTI = 3 
++ CJE = 3.807E-12 
++ VJE = 0.55 
++ MJE = 0.3135 
++ TF = 2.073E-10 
++ XTF = 1 
++ VTF = 11 
++ ITF = 0.17 
++ PTF = 0 
++ CJC = 1.889E-12 
++ VJC = 0.8844 
++ MJC = 0.3014 
++ XCJC = 1 
++ TR = 5E-08 
++ CJS = 0 
++ VJS = 0.75 
++ MJS = 0.333 
++ FC = 0.8517
+
+*

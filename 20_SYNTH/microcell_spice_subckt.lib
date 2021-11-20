@@ -1,0 +1,53 @@
+* Spice library implementing microcells for simulation of post-layout netlists
+* 2021-Nov-20  cpldcpu
+
+
+* Extracted circuit microcell
+.SUBCKT NM G D S
+X1 D G S 2N7002   
+R1 VCC G {RL}
+.ENDS NM
+
+.SUBCKT NMg A G D
+X1 D G GND 2N7002   
+R1 VCC A {RL}
+R2 A G   {RL}
+.ENDS NM
+
+.SUBCKT NOT A Y
+Q1 Y N001 VEE 0 RTL_NPN
+R1 VCC A {RL}
+R2 N001 A {RB}
+.ENDS NOT
+
+.SUBCKT NOTb A base Y
+Q1 Y base VEE 0 RTL_NPN
+R1 VCC A {RL}
+R2 base A {RB}
+.ENDS NOT
+
+* npn pass transistor with collector at input
+.SUBCKT TBUFc E A Y
+Q1 A N001 Y 0 RTL_NPN
+R1 E N001 {RB}
+R2 VCC A {RL}
+R3 VCC E {RL}
+.ENDS NOT
+
+* npn pass transistor with emitter at input
+.SUBCKT TBUFe E A Y
+Q1 Y N001 A 0 RTL_NPN
+R1 E N001 {RB}
+R2 VCC A {RL}
+R3 VCC E {RL}
+.ENDS NOT
+
+* for post layout simulation
+.SUBCKT AMUX B1 B2 S A
+X1 B2 GND B1 A VCC S 74LVC1G3157
+.ENDS
+
+
+
+
+
