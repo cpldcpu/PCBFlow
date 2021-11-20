@@ -14,6 +14,7 @@ if [ "$1" == "" ]; then
     echo ""
     echo "Technologies:"
     echo "  RT      Bipolar Resistor Transistor Logic (default)"
+    echo "  RTPG    Bipolar Resistor Transistor Logic with pass gates"
     echo "  nmos    nmos transistor logic"
     echo "  hybrid  hybrid nmos/bipolar logic"
     echo "  amux    analog multiplexer logic"
@@ -33,6 +34,8 @@ fi
 
 if [ "$APP" == "RT" ]; then
     echo "Synthesizing to bipolar resistor transistor logic"
+elif [ "$APP" == "RTPG" ]; then
+    echo "Synthesizing to bipolar resistor transistor/pass gate logic"
 elif [ "$APP" == "nmos" ]; then
     echo "Synthesizing to nmos transistor logic"
 elif [ "$APP" == "amux" ]; then
