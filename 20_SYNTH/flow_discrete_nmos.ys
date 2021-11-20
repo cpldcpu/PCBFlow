@@ -1,9 +1,11 @@
-# VHDL to Discrete RT-logic
-
+# VHDL to Discrete nmos-logic
 
 # elaborate VHDL code from GHDL
 ghdl
 hierarchy -check
+
+# Read verilog description of cells
+read_verilog -lib ../20_SYNTH/discrete_nmos_logic_cells.v
 
 # Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
 rename -top main

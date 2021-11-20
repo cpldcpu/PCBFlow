@@ -48,9 +48,6 @@ else
     exit 1
 fi
 
-
-
-
 cd Work
 ghdl -a ../10_HDL/$FILE.vhd
 yosys ../20_SYNTH/flow_discrete_$APP.ys >208_log_yosys.txt

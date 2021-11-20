@@ -1,0 +1,109 @@
+* Spice library implementing logic gates in discrete resistor-transistor-logic (RTL)
+* 2021-Nov-01  cpldcpu
+
+* General notes:
+* The load resistor in all cells is at the input, the output is open collector.
+* This helps to automatically adjust biasing, but means that an additonal pull-up
+* resistor has to be added to any open output that does not have internal connections.
+
+* Supported gate types:
+* NOT
+* NAND2
+* NAND3
+* NOR2
+* NOR3
+* AOI2_2
+* DFF
+
+* Global nodes:
+* VCC       positive supply
+* VEE       negative supply
+
+* Global constants
+* RL        Load resistor value
+* RB        Base resistor value
+
+* Uses 2N7002 transistor model pins: D G S
+
+.SUBCKT nm_NOT A Y
+X1 Y A VEE 2N7002   
+R1 VCC Y {RL}
+.ENDS nm_NOT
+
+.SUBCKT nm_BUF A Y
+X1 A B NOT
+X2 B Y NOT
+.ENDS nm_NOT
+
+.SUBCKT nm_NOR2 A B Y
+X1 Y A VEE 2N7002   
+X2 Y B VEE 2N7002   
+R1 VCC Y {RL}
+.ENDS nm_NOR2
+
+.SUBCKT nm_NOR3 A B C Y
+X1 Y A VEE 2N7002   
+X2 Y B VEE 2N7002   
+X3 Y C VEE 2N7002   
+R1 VCC Y {RL}
+.ENDS nm_NOR3
+
+.SUBCKT nm_NAND2 A B Y
+X1 Y    A N001 2N7002   
+X2 N001 B VEE  2N7002   
+R1 VCC Y {RL}
+.ENDS nm_NAND2
+
+.SUBCKT nm_NAND3 A B C Y
+X1 Y    A N001 2N7002   
+X2 N001 B N002 2N7002   
+X3 N002 C VEE  2N7002   
+R1 VCC Y {RL}
+.ENDS nm_NAND3
+
+.SUBCKT nm_AOI2_2 A B C D Y
+X1 Y    A N001 2N7002   
+X2 N001 B VEE  2N7002   
+X3 Y    C N002 2N7002   
+X4 N002 D VEE  2N7002   
+R1 VCC Y {RL}
+.ENDS nm_AOI2_2
+
+
+*.SUBCKT TBUF E A Y
+*Q1 A N001 Y 0 RTL_NPN
+*R1 E N001 {RB}
+*R2 VCC A {RL}
+*R3 VCC E {RL}
+*.ENDS NOT
+
+*.SUBCKT NOTb A base Y
+*Q1 Y base VEE 0 RTL_NPN
+*R1 VCC A {RL}
+*R2 base A {RB}
+*.ENDS NOT
+
+*.SUBCKT DLATCH3Tn E D Qn
+*X1 E D N001 TBUF
+*X2 N002 N001 Qn NOTb
+*X3 Qn N002 NOT
+*.ENDS DLATCH
+
+.SUBCKT PHLATCH E D Q
+X1 D nE N001 nm_NOR2
+X2 E Q nQ nm_NOR2
+X3 N001 nQ Q nm_NOR2
+X4 E nE nm_NOT
+.ENDS DLATCH
+
+.SUBCKT DFF7T C D Q
+X1 nC D t DLATCH3Tn
+X2 C t Q DLATCH3Tn
+X3 C nC NOT
+.ENDS DFF
+
+.SUBCKT nm_DFF C D Q
+X1 nC D t PHLATCH
+X2 C t Q PHLATCH
+X3 C nC nm_NOT
+.ENDS nm_DFF

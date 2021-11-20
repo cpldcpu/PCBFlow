@@ -4,8 +4,11 @@
 
 Logic gates:
   NOT
+  NAND2
+  NAND3
   NOR2
   NOR3
+  AOI2_2
 
 D-Flop:
   DFF
@@ -14,14 +17,14 @@ D-Flop:
 
 library(SingleLogicCells) {
   
-  cell(BUF) {
+  cell(nm_BUF) {
     area: 6;
     pin(A) { direction: input; }
     pin(Y) { direction: output;
               function: "A"; }
   }
   
-  cell(NOT) {
+  cell(nm_NOT) {
     area: 1;
     pin(A) { direction: input; }
     pin(Y) { direction: output;
@@ -29,7 +32,7 @@ library(SingleLogicCells) {
   }
 
 
-  cell(NAND2) {
+  cell(nm_NAND2) {
     area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -37,7 +40,7 @@ library(SingleLogicCells) {
              function: "(A*B)'"; }
   }
 
-  cell(NAND3) {
+  cell(nm_NAND3) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -46,7 +49,7 @@ library(SingleLogicCells) {
              function: "(A*B*C)'"; }
   }
 
-  cell(AOI2) {
+  cell(nm_AOI2_2) {
     area: 4;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -56,7 +59,7 @@ library(SingleLogicCells) {
              function: "((A*B)+(C*D))'"; }
   }
 
-  cell(NOR2) {
+  cell(nm_NOR2) {
     area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -64,7 +67,7 @@ library(SingleLogicCells) {
              function: "(A+B)'"; }
   }
 
-  cell(NOR3) {
+  cell(nm_NOR3) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -73,7 +76,7 @@ library(SingleLogicCells) {
              function: "(A+B+C)'"; }
   }
 
-  cell(DFF) {
+  cell(nm_DFF) {
     area: 13;
     ff(IQ, IQN) { clocked_on: C;
                   next_state: D; }
@@ -83,6 +86,4 @@ library(SingleLogicCells) {
     pin(Q) { direction: output;
               function: "IQ"; }
   }
-
-
 }
