@@ -264,12 +264,18 @@ class CellArray():
         return df
 
     # I/O cells are added to row 0 by definition for now
-    def addiocell(self, net):
+    def addiocell(self, net,FixedIO=[]):
         for key, val in self.array.items():
             if val.type == "EMPTY" and val.y == 0:
-                del self.array[key]
-                self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
-                return  
+                if net in FixedIO:
+                    if val.x==FixedIO.index(net):
+                        del self.array[key]
+                        self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
+                        return
+                elif val.x>=len(FixedIO):
+                    del self.array[key]
+                    self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
+                    return  
         raise CAParsingError("Could not insert I/O cell in line zero! Please increase the X-width of the cell array.")
 
     # Add logic cell (subckt starting with X)
@@ -403,7 +409,7 @@ class CellArray():
                 ymin = ymin if self.array[currentcell].y>ymin else self.array[currentcell].y
                 ymax = ymax if self.array[currentcell].y<ymax else self.array[currentcell].y
 
-            netlength=2*(xmax-xmin)+ymax-ymin 
+            netlength=3*(xmax-xmin)+ymax-ymin 
             self.nets[netname][0] = netlength
         else:                       # old algorithm, manhattan spanning tree
             lastcell = cells[-1]        
@@ -424,8 +430,8 @@ class CellArray():
     def swapcells(self, cell1, cell2):
         x1,y1 = [self.array[cell1].x , self.array[cell1].y]
         x2,y2 = [self.array[cell2].x , self.array[cell2].y]
-        [self.array[cell2].x , self.array[cell2].y] = [x2,y2]
-        [self.array[cell1].x , self.array[cell1].y] = [x1,y1]
+        [self.array[cell1].x , self.array[cell1].y] = [x2,y2]
+        [self.array[cell2].x , self.array[cell2].y] = [x1,y1]
         lenbefore=0
         lenafter=0
     
@@ -468,7 +474,7 @@ class CellArray():
                 self.swapcells(cell1,cell2)
 
 
-def parsesptocellarray(filename, startarray ):
+def parsesptocellarray(filename, startarray,FixedIO=[] ):
     """ Parse a spice netlist given as file to a CellArray structure    
     filename = name of spice netlist
     inputarray = CellArray 
@@ -484,10 +490,10 @@ def parsesptocellarray(filename, startarray ):
                 if words[0] == ".SUBCKT":
                     subckt = words[1]
                     ports =  words[2:]
-                    startarray.addiocell("VCC")
+                    startarray.addiocell("VCC", FixedIO)
                     for net in ports:
-                        startarray.addiocell(net)
-                    startarray.addiocell("GND")
+                        startarray.addiocell(net, FixedIO)
+                    startarray.addiocell("GND", FixedIO)
                 elif words[0] == ".ENDS":
                     subckt = ""
                 elif words[0][0] == "X":
@@ -573,16 +579,19 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea = 61         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 14         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 28         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
+# FixedIO     = []         # Default, tool assigns I/O
+FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
 
 # Optimizer settings. Only change when needed
 
-AreaMargin = 0.3        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
+AreaMargin = 0.3+1        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
                         # Too large values will result in waste of area.
-CoarseAttempts = 2      # 20
-CoarseCycles   = 10   # 1000
-FineCycles     = 100  # 10000 Increase to improve larger designs. 
+CoarseAttempts = 20     # 20
+CoarseCycles   = 1000   # 1000
+FineCycles     = 10000  # 10000 Increase to improve larger designs. 
 
 # Pitch of grid on PCB in mm
 
@@ -605,7 +614,7 @@ startarray = CellArray(ArrayXwidth,1+int(math.ceil(DesignArea*(1+AreaMargin)/Arr
 print("Number of cells in design: {0}\nArea margin: {1}%".format(DesignArea,AreaMargin*100))
 print("Array Xwidth: {0}\nArray Ywidth: {1}\n".format(startarray.SizeX, startarray.SizeY))
 
-parsesptocellarray(InputFileName,startarray)
+parsesptocellarray(InputFileName,startarray,FixedIO)
 startarray.rebuildnets()
 pdframe = startarray.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')
