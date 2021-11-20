@@ -14,6 +14,11 @@
 * DLATCH
 * DFF
 
+* Special gates utilizing pass gate NPN
+* XOR2
+* DFF7T
+* DLATCH3Tn
+
 * Global nodes:
 * VCC       positive supply
 * VEE       negative supply
@@ -22,14 +27,8 @@
 * RL        Load resistor value
 * RB        Base resistor value
 
-* "RTL_NPN" needs to be defined elsewhere and should be a generic NPN switching transistor
-* (e.g. MMBT3904, PMBT2369)
-
-.SUBCKT NOT A Y
-Q1 Y N001 VEE 0 RTL_NPN
-R1 VCC A {RL}
-R2 N001 A {RB}
-.ENDS NOT
+* Microcells defined elsewhere:
+* NOT, NOTb, TBUFc, TBUFe
 
 .SUBCKT BUF A Y
 X1 A B NOT
@@ -47,21 +46,14 @@ X2 B Y NOT
 X3 C Y NOT
 .ENDS NOR2
 
-.SUBCKT TBUF E A Y
-Q1 A N001 Y 0 RTL_NPN
-R1 E N001 {RB}
-R2 VCC A {RL}
-R3 VCC E {RL}
-.ENDS NOT
-
-.SUBCKT NOTb A base Y
-Q1 Y base VEE 0 RTL_NPN
-R1 VCC A {RL}
-R2 base A {RB}
-.ENDS NOT
+.SUBCKT XOR2 A B Y
+X1 A B N001 TBUFe
+X1 B A N001 TBUFe
+X2 N001 Y NOT
+.ENDS NOR2
 
 .SUBCKT DLATCH3Tn E D Qn
-X1 E D N001 TBUF
+X1 E D N001 TBUFc
 X2 N002 N001 Qn NOTb
 X3 Qn N002 NOT
 .ENDS DLATCH

@@ -25,6 +25,9 @@
 
 * Uses 2N7002 transistor model pins: D G S
 
+* Microcells defined elsewhere:
+* NM, NMG, TBUFc, TBUFe
+
 .SUBCKT nm_NOT A Y
 X1 Y A VEE 2N7002   
 R1 VCC Y {RL}
@@ -107,3 +110,4 @@ X1 nC D t PHLATCH
 X2 C t Q PHLATCH
 X3 C nC nm_NOT
 .ENDS nm_DFF
+

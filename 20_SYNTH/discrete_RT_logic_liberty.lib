@@ -44,6 +44,14 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
              function: "(A+B+C)'"; }
   }
+/*
+  cell(XOR2) {
+    area: 3;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A^B)"; }
+  }
 
   cell(DFF7T) {
     area: 7;
@@ -55,7 +63,7 @@ library(SingleLogicCells) {
     pin(Q) { direction: output;
               function: "IQ"; }
   }
-
+*/
   cell(DFF) {
     area: 15;
     ff(IQ, IQN) { clocked_on: C;
