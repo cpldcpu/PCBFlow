@@ -6,21 +6,22 @@
 Vee Vee 0 DC 0
 Vcc Vcc 0 DC 5
 
-
 * load design and library
-.include ../20_SYNTH/discrete_amux_logic_spice_subckt.lib
+.include ../20_SYNTH/microcell_spice_subckt.lib
+.include ../20_SYNTH/2N7002.lib
+* .include ../20_SYNTH/PMBT2369.lib
+.include ../20_SYNTH/PMBT3904.lib
 .include ../20_SYNTH/amux.lib
 .include 308_extracted_netlist.sp
 
 * Define base and load resistor
-.param RL=4.7k
-.param RB=4.7k
+.param RL=3.3k
+.param RB=3.3k
 
 * input signals
 
 Vclk clk 0 PULSE(0 5 10u 20n 20n 8u 20u)
 Vrst rst 0 PULSE(0 5 5u 20n 20n 29u 400u)
-
 
 * Note: No pull up needed on outputs since they are internally connected. B
 * Pull ups may have to be added for other designs
