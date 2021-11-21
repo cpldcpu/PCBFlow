@@ -54,6 +54,35 @@ class PCBPlacer():
 
         et.SubElement(n_signet, 'contactref', element = element, pad = pad)
 
+    def insertLED(self,x, y, netin, cellname="void"):
+        """Insert LED including bipolar driver transistor"""
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
+        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
+        et.SubElement(n_elements, 'element', name = "L"+cellname, library="discrete_logic_components", package="LED0603", value="RES", x=str(x+3.25), y=str(y+3.4) ,rot="R180")
+
+        self.addcontact('GND' , "Q"+cellname, "2" )
+        self.addcontact("B$" + str(self.devcounter) , "Rl"+cellname, "2" )
+        self.addcontact("B$" + str(self.devcounter) , "L"+cellname, "A" )
+     
+        self.addcontact('VCC' , "Rl"+cellname, "1" )
+
+        self.devcounter += 1
+
+        self.addcontact(netin , "Rb"+cellname, "1" )
+
+        self.addcontact("B$" + str(self.devcounter) , "Q"+cellname, "3")
+        self.addcontact("B$" + str(self.devcounter) , "L"+cellname, "C")
+
+        self.devcounter += 1
+
+        self.addcontact("B$" + str(self.devcounter), "Q"+cellname, "1")
+        self.addcontact("B$" + str(self.devcounter), "Rb"+cellname, "2")
+
+        self.devcounter += 1
+
     def insertNOT(self,x, y, netin, netout, cellname="void"):
         """Insert RTL inverter at position x,y
         Assumes standard library with transistor and resistor
@@ -84,6 +113,8 @@ class PCBPlacer():
         self.addcontact(netbase, "Rb"+cellname, "2")
 
         self.devcounter += 1
+
+
 
     def insertTBUFe(self,x, y, netenable, netin, netout, cellname="void"):
         """Insert RTL inverter with base tap at position x,y
@@ -318,6 +349,9 @@ class CellArray():
                 pass            
             elif celltype == 'IO':
                 board.insertIO(val.y*pitchx,val.x*pitchy,val.pin[0],str(val.pin[0]))
+        # LED
+            elif celltype == 'LED':
+                board.insertLED(val.y*pitchx,val.x*pitchy,val.pin[0],key)
             else:
                 print("Failed to insert footprint of cell {0}, type unknown\t".format(key), end="")
                 print(celltype)
@@ -368,19 +402,33 @@ class CellArray():
         return df
 
     # I/O cells are added to row 0 by definition for now
-    def addiocell(self, net,FixedIO=[]):
+    def addiocell(self, net,FixedIO=[],LEDS=[]):
         for key, val in self.array.items():
             if val.type == "EMPTY" and val.y == 0:
                 if net in FixedIO:
                     if val.x==FixedIO.index(net):
                         del self.array[key]
                         self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
+                        if net in LEDS:
+                            self.addled(net,val.x,val.y+1)
                         return
                 elif val.x>=len(FixedIO):
                     del self.array[key]
                     self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
+                    if net in LEDS:
+                        self.addled(net,val.x,val.y+1)
                     return  
         raise CAParsingError("Could not insert I/O cell in line zero! Please increase the X-width of the cell array or correct FixedIO assignment.")
+
+    def addled(self, net , x , y ):
+        """ add LED at fixed position"""
+        for key, val in self.array.items():
+            if val.type == "EMPTY" and val.x == x and val.y == y:
+                del self.array[key]
+                self.array["XLED"+str(val.x)] = Cell('LED', False, val.x, val.y, [net])                
+                return
+        raise CAParsingError("Could not insert LED cell for NET: "+str(net))
+        
 
     # Add logic cell (subckt starting with X)
     # Complex cells are recursively broken down into less complex cells
@@ -648,7 +696,7 @@ class CellArray():
                 self.swapcells(cell1,cell2)
 
 
-def parsesptocellarray(filename, startarray,FixedIO=[] ):
+def parsesptocellarray(filename, startarray,FixedIO=[],LEDS=[]):
     """ Parse a spice netlist given as file to a CellArray structure    
     filename = name of spice netlist
     inputarray = CellArray 
@@ -666,7 +714,7 @@ def parsesptocellarray(filename, startarray,FixedIO=[] ):
                     ports =  words[2:]
                     startarray.addiocell("VCC", FixedIO)
                     for net in ports:
-                        startarray.addiocell(net, FixedIO)
+                        startarray.addiocell(net, FixedIO,LEDS)
                     startarray.addiocell("GND", FixedIO)
                 elif words[0] == ".ENDS":
                     subckt = ""
@@ -754,10 +802,15 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 # !!! You need to update the lines below to adjust for your design!!! 
 
 ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 59         # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
-                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
-FixedIO     = []         # Default, tool assigns I/O
+DesignArea  = 61        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+                        # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
+FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
+
+                        # Insert monitoring LEDs for I/O pins in list
+# LEDS        = []      # Default, don't insert any LEDs
+LEDS        = ["count.0","count.1","count.2"]         
+
 
 # Optimizer settings. Only change when needed
 
@@ -789,7 +842,7 @@ startarray = CellArray(ArrayXwidth,1+int(math.ceil(DesignArea*(1+AreaMargin)/Arr
 print("Number of cells in design: {0}\nArea margin: {1}%".format(DesignArea,AreaMargin*100))
 print("Array Xwidth: {0}\nArray Ywidth: {1}\n".format(startarray.SizeX, startarray.SizeY))
 
-parsesptocellarray(InputFileName,startarray,FixedIO)
+parsesptocellarray(InputFileName,startarray,FixedIO,LEDS)
 startarray.rebuildnets()
 pdframe = startarray.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')

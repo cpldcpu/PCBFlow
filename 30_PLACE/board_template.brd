@@ -140,6 +140,27 @@
                             <smd name="1" x="-0.4846" y="0" dx="0.56" dy="0.6291" layer="1"/>
                             <smd name="2" x="0.4846" y="0" dx="0.56" dy="0.6291" layer="1"/>
                         </package>
+                        <package name="LED0603">
+                            <description>0603 LED</description>
+                            <wire x1="-0.3" y1="0.8" x2="0.3" y2="0.8" width="0.1016" layer="51" curve="170.055574"/>
+                            <wire x1="-0.275" y1="-0.825" x2="0.275" y2="-0.825" width="0.0508" layer="51" curve="-180"/>
+                            <wire x1="-0.4" y1="0.375" x2="-0.4" y2="-0.35" width="0.1016" layer="51"/>
+                            <wire x1="0.4" y1="0.35" x2="0.4" y2="-0.35" width="0.1016" layer="51"/>
+                            <circle x="-0.35" y="0.625" radius="0.075" width="0.0508" layer="51"/>
+                            <smd name="C" x="0" y="0.75" dx="0.8" dy="0.8" layer="1"/>
+                            <smd name="A" x="0" y="-0.75" dx="0.8" dy="0.8" layer="1"/>
+                            <rectangle x1="-0.45" y1="0.7" x2="-0.25" y2="0.85" layer="51"/>
+                            <rectangle x1="-0.275" y1="0.55" x2="-0.225" y2="0.6" layer="51"/>
+                            <rectangle x1="-0.45" y1="0.35" x2="-0.4" y2="0.725" layer="51"/>
+                            <rectangle x1="0.25" y1="0.55" x2="0.45" y2="0.85" layer="51"/>
+                            <rectangle x1="-0.45" y1="0.35" x2="0.45" y2="0.575" layer="51"/>
+                            <rectangle x1="-0.45" y1="-0.85" x2="-0.25" y2="-0.35" layer="51"/>
+                            <rectangle x1="0.25" y1="-0.85" x2="0.45" y2="-0.35" layer="51"/>
+                            <rectangle x1="-0.275" y1="-0.575" x2="0.275" y2="-0.35" layer="51"/>
+                            <rectangle x1="-0.275" y1="-0.65" x2="-0.175" y2="-0.55" layer="51"/>
+                            <rectangle x1="0.175" y1="-0.65" x2="0.275" y2="-0.55" layer="51"/>
+                            <rectangle x1="-0.125" y1="0" x2="0.125" y2="0.25" layer="21"/>
+                        </package>                    
                     </packages>
                 </library>
             </libraries>
