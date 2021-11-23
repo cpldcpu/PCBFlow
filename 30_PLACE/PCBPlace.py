@@ -801,15 +801,15 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 61        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 7         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 38        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
 
                         # Insert monitoring LEDs for I/O pins in list
 # LEDS        = []      # Default, don't insert any LEDs
-LEDS        = ["count.0","count.1","count.2"]         
+LEDS        = ["clk","count.0","count.1","count.2"]         
 
 
 # Optimizer settings. Only change when needed
@@ -822,8 +822,8 @@ FineCycles     = 10000  # 10000 Increase to improve larger designs.
 
 # Pitch of grid on PCB in mm
 
-PCBPitchx = 5 # default 5
-PCBPitchy = 7 # default 7
+PCBPitchx = 2.54*2 # default 5
+PCBPitchy = 2.54*3 # default 7
 
 # File names. Don't touch unless you want to modify the flow
 
@@ -842,13 +842,19 @@ startarray = CellArray(ArrayXwidth,1+int(math.ceil(DesignArea*(1+AreaMargin)/Arr
 print("Number of cells in design: {0}\nArea margin: {1}%".format(DesignArea,AreaMargin*100))
 print("Array Xwidth: {0}\nArray Ywidth: {1}\n".format(startarray.SizeX, startarray.SizeY))
 
+print("=== Parsing input file & Inserting Microcells ===\n")
+
 parsesptocellarray(InputFileName,startarray,FixedIO,LEDS)
+print("Parsing successful...")
+
 startarray.rebuildnets()
+
+
+print("Initial net-length:", startarray.totallength)
+print("Initial Placement:\n")
+
 pdframe = startarray.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')
-
-print("=== Parsing of input file successful ===\n")
-print("Initial net-length:", startarray.totallength)
 print(pltdata)
 print()
 
