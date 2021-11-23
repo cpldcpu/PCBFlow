@@ -55,8 +55,3 @@ X1 nC D t am_LATCH
 X2 C t Q am_LATCH
 X3 C nC am_NOT
 .ENDS 
-
-* for post layout simulation
-.SUBCKT AMUX B1 B2 S A
-X1 B2 GND B1 A VCC S 74LVC1G3157
-.ENDS

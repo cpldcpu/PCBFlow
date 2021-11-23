@@ -1,5 +1,5 @@
-# PCBPlace v0.22a
-# 21-Nov-9 cpldcpu
+# PCBPlace v0.3a
+# 21-Nov-23 cpldcpu
 #
 # Very hacky early state, in urgent need of refactoring
 
@@ -469,19 +469,33 @@ class CellArray():
             self.insertcell(name+"" ,"AMUX", ['VCC'   , 'GND'   , nets[0] , nets[1] ])
         elif celltype == "am_AND2":
             self.insertcell(name+"" ,"AMUX", ['GND'   , nets[1] , nets[0] , nets[2] ])
+        elif celltype == "am_ANDN2":
+            self.insertcell(name+"" ,"AMUX", [nets[1] , 'GND'   , nets[0] , nets[2] ])
         elif celltype == "am_OR2":
             self.insertcell(name+"" ,"AMUX", [nets[1] , 'VCC'   , nets[0] , nets[2] ])
+        elif celltype == "am_ORN2":
+            self.insertcell(name+"" ,"AMUX", ['VCC'   , nets[1] , nets[0] , nets[2] ])
         elif celltype == "am_MUX2":
             self.insertcell(name+"" ,"AMUX", [nets[0] , nets[1] , nets[2] , nets[3] ])
         elif celltype == "am_XOR2":
             self.addlogiccell(name+"a","am_NOT", [nets[1] , name+"Bn"])   
             self.insertcell  (name+"b","AMUX"  , [nets[1] , name+"Bn" , nets[0] , nets[2] ])
+        elif celltype == "am_XNOR2":
+            self.addlogiccell(name+"a","am_NOT", [nets[1]  , name+"Bn"])   
+            self.insertcell  (name+"b","AMUX"  , [name+"Bn", nets[1]  , nets[0] , nets[2] ])
         elif celltype == "am_DFF":
-            self.addlogiccell(name+"c","am_NOT",   [nets[0], name+"CI"])   # clock inversion
-            self.addlogiccell(name+"a","am_LATCH", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
+            # 5 amux latch
+            # self.addlogiccell(name+"c","am_NOT",   [nets[0], name+"CI"])   # clock inversion    
+            # self.addlogiccell(name+"a","am_LATCH", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
+            # self.addlogiccell(name+"b","am_LATCH", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
+            # 4 amux latch according to Joan Illuchs idea. a bit more timing critical, but seems to work in spice.
+            self.addlogiccell(name+"a","am_LATCH_nClk", [nets[0], nets[1], name+"DI"])  # pin order: E, D, Q
             self.addlogiccell(name+"b","am_LATCH", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
         elif celltype == "am_LATCH":
             self.insertcell(name+"a" ,"AMUX", [nets[2] , nets[1] , nets[0]    , name+"X1o" ])
+            self.insertcell(name+"b" ,"AMUX", [ 'GND'  , 'VCC'   , name+"X1o" , nets[2]    ])
+        elif celltype == "am_LATCH_nClk":  # negatived Enable/clock input
+            self.insertcell(name+"a" ,"AMUX", [nets[1] , nets[2] , nets[0]    , name+"X1o" ])
             self.insertcell(name+"b" ,"AMUX", [ 'GND'  , 'VCC'   , name+"X1o" , nets[2]    ])
         # LVC cells
         # insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
