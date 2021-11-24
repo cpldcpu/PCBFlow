@@ -21,6 +21,13 @@ from dataclasses import dataclass
 class PCBPlacer():
     def __init__(self, filename):
         self.loadeagle(filename)
+        self.components= {}    # Dictionary of components
+
+    def countcomponent(self, componentname, number=1):
+        if not componentname in self.components:
+            self.components[componentname] = number
+        else:
+            self.components[componentname] += number
 
 #load eagle file
     def loadeagle(self,filename):
@@ -62,6 +69,9 @@ class PCBPlacer():
         et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
         et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
         et.SubElement(n_elements, 'element', name = "L"+cellname, library="discrete_logic_components", package="LED0603", value="RES", x=str(x+3.25), y=str(y+3.4) ,rot="R180")
+        self.countcomponent("npn transistor")
+        self.countcomponent("resistor",2)
+        self.countcomponent("led")
 
         self.addcontact('GND' , "Q"+cellname, "2" )
         self.addcontact("B$" + str(self.devcounter) , "Rl"+cellname, "2" )
@@ -100,6 +110,8 @@ class PCBPlacer():
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
         et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
         et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
+        self.countcomponent("npn transistor")
+        self.countcomponent("resistor",2)
 
         self.addcontact('GND' , "Q"+cellname, "2" )
         self.addcontact('VCC' , "Rl"+cellname, "2" )
@@ -126,6 +138,8 @@ class PCBPlacer():
         et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
         et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
         et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+3.2), y=str(y+3.4))
+        self.countcomponent("npn transistor")
+        self.countcomponent("resistor",3)
 
         self.addcontact(netin , "Q"+cellname, "2" )
         self.addcontact('VCC' , "Rl"+cellname, "2" )
@@ -153,6 +167,8 @@ class PCBPlacer():
         et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
         et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
         et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+3.2), y=str(y+3.4))
+        self.countcomponent("npn transistor")
+        self.countcomponent("resistor",3)
 
         self.addcontact(netin , "Q"+cellname, "3" )
         self.addcontact('VCC' , "Rl"+cellname, "2" )
@@ -179,6 +195,8 @@ class PCBPlacer():
         n_elements = self.n_board.find('elements')
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="2N7002", x=str(x+1.65), y=str(y+1.4))
         et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
+        self.countcomponent("nmos transistor")
+        self.countcomponent("resistor")
 
         self.addcontact(netsource , "Q" +cellname, "2" )
         self.addcontact('VCC'     , "Rl"+cellname, "2" )
@@ -199,6 +217,8 @@ class PCBPlacer():
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="2N7002", x=str(x+1.65), y=str(y+1.4))
         et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
         et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
+        self.countcomponent("nmos transistor")
+        self.countcomponent("resistor",2)
 
         self.addcontact('GND'   , "Q"+cellname , "2" )
         self.addcontact('VCC'   , "Rl"+cellname, "2" )
@@ -218,6 +238,7 @@ class PCBPlacer():
 
         n_elements = self.n_board.find('elements')
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SC70-6", value="74LVC1G3157", x=str(x+1.65), y=str(y+1.4))
+        self.countcomponent("amux")
 
         self.addcontact(netB2  , "Q"+cellname, "1" )
         self.addcontact('GND'  , "Q"+cellname, "2" )
@@ -232,6 +253,7 @@ class PCBPlacer():
 
         n_elements = self.n_board.find('elements')
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G57", x=str(x+1.65), y=str(y+1.4))
+        self.countcomponent("1G57")
 
         self.addcontact(netinb , "Q"+cellname, "1" )
         self.addcontact('GND'  , "Q"+cellname, "2" )
@@ -246,6 +268,7 @@ class PCBPlacer():
 
         n_elements = self.n_board.find('elements')
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G175", x=str(x+1.65), y=str(y+1.4))
+        self.countcomponent("1G175")
 
         self.addcontact(netclk  , "Q"+cellname, "1" )
         self.addcontact('GND'   , "Q"+cellname, "2" )
@@ -260,6 +283,9 @@ class PCBPlacer():
         n_elements = self.n_board.find('elements')
         n_iopin = et.SubElement(n_elements, 'element', name = "E"+str(self.devcounter), library="discrete_logic_components", package="1X01", value=name, x=str(x), y=str(y+2.54))
 #        et.SubElement(n_iopin, 'attribute', name= 'VALUE', x=str(x - 1.27), y=str(y), size="1.27", layer="27") # adds name to document layer
+
+        self.countcomponent("pin")
+
         self.addcontact(netin , "E"+str(self.devcounter), "1" )
         self.devcounter += 1
 
@@ -393,7 +419,7 @@ class CellArray():
     def printnets(self):
         """ list all nets with fanout"""
         for key, net in self.nets.items():
-            print("Net: {0}\t\t Connections: {1}".format(key,len(net[1])))
+            print("Net: {0:20}Connections: {1}".format(key,len(net[1])))
 
     # return pandas dataframe
     def returnpdframe(self):
@@ -815,8 +841,8 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 7         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 38        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 24         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 273        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
@@ -830,9 +856,9 @@ LEDS        = ["clk","count.0","count.1","count.2"]
 
 AreaMargin = 0.5        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
                         # Too large values will result in waste of area.
-CoarseAttempts = 20     # 20
+CoarseAttempts = 2     # 20
 CoarseCycles   = 1000   # 1000
-FineCycles     = 10000  # 10000 Increase to improve larger designs. 
+FineCycles     = 1000  # 10000 Increase to improve larger designs. 
 
 # Pitch of grid on PCB in mm
 
@@ -845,9 +871,11 @@ InputFileName = "209_synthesized_output.sp"
 PCBTemplateFile = "../30_PLACE/board_template.brd" 
 PCBOutputFile = "309_board_output.brd"
 SpiceOutputFile = "308_extracted_netlist.sp"
+FanoutOutputFile = "307_fanout.txt"
+NetsOutputFile  = "306_nets.csv"
+PlacementOutputFile = "305_placement.csv"
 
 # =========== START OF MAIN ===============================
-
 
 print("=== Setting up array ===\n")
 
@@ -862,7 +890,6 @@ parsesptocellarray(InputFileName,startarray,FixedIO,LEDS)
 print("Parsing successful...")
 
 startarray.rebuildnets()
-
 
 print("Initial net-length:", startarray.totallength)
 print("Initial Placement:\n")
@@ -899,14 +926,22 @@ print("=== Final Placement ===\n")
 pdframe = array_opt.returnpdframe()
 pltdata = pdframe.pivot('Y','X','Celltype')
 print(pltdata)
+pltdata.to_csv(PlacementOutputFile, sep='\t')
+
+printf("\nMicrocell counts:")
+print(pdframe['Celltype'].value_counts())
 
 print("\n=== Final Nets ===\n")
 
 pltdata = pdframe.pivot('Y','X','Nets')
-print(pltdata)
+# print(pltdata)
+pltdata.to_csv(NetsOutputFile, sep='\t')
 
-print("\n=== Fan out ===\n")
-array_opt.printnets()
+with open(FanoutOutputFile, "w") as file:
+    for key, net in array_opt.nets.items():
+        file.write("{0}\t{1}\n".format(key,len(net[1])))
+
+# array_opt.printnets()
 
 print("\n=== Writing Footprints to File ===\n")
 pcb = PCBPlacer(PCBTemplateFile)
@@ -914,4 +949,17 @@ array_opt.outputtoboard(pcb, pitchx = PCBPitchx, pitchy = PCBPitchy )
 pcb.saveeagle(PCBOutputFile)
 
 print("\n=== Writing Extracted Spice Netlist ===\n")
+
 array_opt.extracttospice(SpiceOutputFile)
+
+print("\n=== Component usage ===\n")
+
+print("{0:20}{1}\n".format("Component","Count"))
+compcount=0
+for key, num in pcb.components.items():
+    print("{0:20}{1}".format(key,num))
+    compcount += num
+
+print("{0:20}{1}".format("------------------","-----"))
+print("{0:20}{1}".format("Total:",compcount))
+
