@@ -68,10 +68,19 @@ class PCBPlacer():
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
         et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
         et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3))
-        et.SubElement(n_elements, 'element', name = "L"+cellname, library="discrete_logic_components", package="LED0603", value="RES", x=str(x+3.25), y=str(y+3.4) ,rot="R180")
+        et.SubElement(n_elements, 'element', name = "L"+cellname, library="discrete_logic_components", package="LED0603", value="LED", x=str(x+3.25), y=str(y+3.4) ,rot="R180")
         self.countcomponent("npn transistor")
         self.countcomponent("resistor",2)
         self.countcomponent("led")
+
+        # doppelled
+        # et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+5.3))
+        # et.SubElement(n_elements, 'element', name = "L2"+cellname, library="discrete_logic_components", package="LED0603", value="RES", x=str(x+4.25), y=str(y+3.4) ,rot="R180")
+        # self.addcontact("Bc$" + str(self.devcounter) , "Rl2"+cellname, "2" )
+        # self.addcontact("Bc$" + str(self.devcounter) , "L2"+cellname, "A" )
+        # self.addcontact('VCC' , "Rl2"+cellname, "1" )
+        # self.addcontact("B$" + str(self.devcounter+1) , "L2"+cellname, "C")
+
 
         self.addcontact('GND' , "Q"+cellname, "2" )
         self.addcontact("B$" + str(self.devcounter) , "Rl"+cellname, "2" )
@@ -232,13 +241,19 @@ class PCBPlacer():
         self.addcontact(netgate , "Rb"+cellname, "2")
 
 
-    def insertAMUX(self,x, y, netB1, netB2, netS, netout, cellname=""):
+    def insertAMUX(self,x, y, netB1, netB2, netS, netout, cellname="", cap=True):
         """Insert analog multiplexer 74LVC1G3157
         Assumes standard library, supply nets VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SC70-6", value="74LVC1G3157", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SC70-6", value="74LVC1G3157", x=str(x+1.60), y=str(y+1.4))
         self.countcomponent("amux")
+
+        if cap==True:
+            et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x+3.6), y=str(y+1.4),rot="R90")
+            self.countcomponent("cap")
+            self.addcontact('VCC'  , "C"+cellname, "2" )
+            self.addcontact('GND'  , "C"+cellname, "1" )
 
         self.addcontact(netB2  , "Q"+cellname, "1" )
         self.addcontact('GND'  , "Q"+cellname, "2" )
@@ -247,13 +262,19 @@ class PCBPlacer():
         self.addcontact('VCC'  , "Q"+cellname, "5" )
         self.addcontact(netS   , "Q"+cellname, "6" )
 
-    def insert1G57(self,x, y, netina, netinb, netinc, netout, cellname=""):
+    def insert1G57(self,x, y, netina, netinb, netinc, netout, cellname="", cap=True):
         """Insert multifunction gate 74LVC1G57
         Assumes standard library, supply nets VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G57", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G57", x=str(x+1.6), y=str(y+1.4))
         self.countcomponent("1G57")
+
+        if cap==True:
+            et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x+4.2), y=str(y+1.4),rot="R90")
+            self.countcomponent("cap")
+            self.addcontact('VCC'  , "C"+cellname, "2" )
+            self.addcontact('GND'  , "C"+cellname, "1" ) 
 
         self.addcontact(netinb , "Q"+cellname, "1" )
         self.addcontact('GND'  , "Q"+cellname, "2" )
@@ -262,13 +283,19 @@ class PCBPlacer():
         self.addcontact('VCC'  , "Q"+cellname, "5" )
         self.addcontact(netinc , "Q"+cellname, "6" )
 
-    def insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
+    def insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname="", cap=True):
         """Insert D-Flipflop 74LVC1G175
         Assumes standard library, supply nets VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G175", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G175", x=str(x+1.6), y=str(y+1.4))
         self.countcomponent("1G175")
+
+        if cap==True:
+            et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x+4.2), y=str(y+1.4),rot="R90")
+            self.countcomponent("cap")
+            self.addcontact('VCC'  , "C"+cellname, "2" )
+            self.addcontact('GND'  , "C"+cellname, "1" )        
 
         self.addcontact(netclk  , "Q"+cellname, "1" )
         self.addcontact('GND'   , "Q"+cellname, "2" )
@@ -277,12 +304,17 @@ class PCBPlacer():
         self.addcontact('VCC'   , "Q"+cellname, "5" )
         self.addcontact(netclrn , "Q"+cellname, "6" )
 
-    def insertIO(self,x, y, netin, name =""):
+    def insertIO(self,x, y, netin, name ="", pullup=False):
         """Insert I/O pin at position x,y"""
 
         n_elements = self.n_board.find('elements')
         n_iopin = et.SubElement(n_elements, 'element', name = "E"+str(self.devcounter), library="discrete_logic_components", package="1X01", value=name, x=str(x), y=str(y+2.54))
 #        et.SubElement(n_iopin, 'attribute', name= 'VALUE', x=str(x - 1.27), y=str(y), size="1.27", layer="27") # adds name to document layer
+
+        if pullup:
+            et.SubElement(n_elements, 'element', name = "Rp"+name, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+2.54), y=str(y+2.54))
+            self.addcontact('VCC'   , "Rp"+name, "2" )
+            self.addcontact(netin   , "Rp"+name, "1" )
 
         self.countcomponent("pin")
 
@@ -343,6 +375,8 @@ class CellArray():
         for key, val in self.array.items():
             # celltype = val[0]
             celltype = val.type
+            insertcap= val.y%2==0
+
         ## RTL cells            
             if celltype == 'NOT':
                 board.insertNOT(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
@@ -356,14 +390,14 @@ class CellArray():
  #               board.insertTBUF(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
         ## Amux logic cells
             elif celltype == 'AMUX':
-                board.insertAMUX(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key)
+                board.insertAMUX(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key,cap=insertcap)
         ## LVC logic cells
         #   def insert1G175(self,x, y, netclk, netind, netclrn, netoutq, cellname=""):
         #   def insert1G57 (self,x, y, netina, netinb, netinc , netout , cellname=""):
             elif celltype == 'LVC1G175':
-                board.insert1G175(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key)
+                board.insert1G175(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key,cap=insertcap)
             elif celltype == 'LVC1G57':                
-                board.insert1G57(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key)
+                board.insert1G57(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],val.pin[3],key,cap=insertcap)
         # nmos cells
             elif celltype == 'NM':                
                 board.insertNMOSinv(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
@@ -375,6 +409,8 @@ class CellArray():
                 pass            
             elif celltype == 'IO':
                 board.insertIO(val.y*pitchx,val.x*pitchy,val.pin[0],str(val.pin[0]))
+            elif celltype == 'IOP':
+                board.insertIO(val.y*pitchx,val.x*pitchy,val.pin[0],str(val.pin[0]),pullup=True)
         # LED
             elif celltype == 'LED':
                 board.insertLED(val.y*pitchx,val.x*pitchy,val.pin[0],key)
@@ -390,7 +426,7 @@ class CellArray():
             # I/O Pins (Extracted in order of insertion, VCC GND omitted)
             file.write(".SUBCKT main")
             for key, val in self.array.items():
-                if  val.type == "IO" and val.pin[0] != "VCC" and val.pin[0] != "GND":
+                if  (val.type == "IO" or val.type == "IOP") and val.pin[0] != "VCC" and val.pin[0] != "GND":
                     file.write(" "+val.pin[0])
             file.write("\n")
             # Cells
@@ -428,19 +464,24 @@ class CellArray():
         return df
 
     # I/O cells are added to row 0 by definition for now
-    def addiocell(self, net,FixedIO=[],LEDS=[]):
+    def addiocell(self, net,FixedIO=[],LEDS=[],Pullups=[]):
+        if net in Pullups:
+            celltype='IOP'
+        else:
+            celltype='IO'
+
         for key, val in self.array.items():
             if val.type == "EMPTY" and val.y == 0:
                 if net in FixedIO:
                     if val.x==FixedIO.index(net):
                         del self.array[key]
-                        self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
+                        self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y, [net])
                         if net in LEDS:
                             self.addled(net,val.x,val.y+1)
                         return
                 elif val.x>=len(FixedIO):
                     del self.array[key]
-                    self.array["IO"+str(val.x)] = Cell('IO', False, val.x, val.y, [net])
+                    self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y, [net])
                     if net in LEDS:
                         self.addled(net,val.x,val.y+1)
                     return  
@@ -736,7 +777,7 @@ class CellArray():
                 self.swapcells(cell1,cell2)
 
 
-def parsesptocellarray(filename, startarray,FixedIO=[],LEDS=[]):
+def parsesptocellarray(filename, startarray,FixedIO=[],LEDS=[],Pullups=[]):
     """ Parse a spice netlist given as file to a CellArray structure    
     filename = name of spice netlist
     inputarray = CellArray 
@@ -754,7 +795,7 @@ def parsesptocellarray(filename, startarray,FixedIO=[],LEDS=[]):
                     ports =  words[2:]
                     startarray.addiocell("VCC", FixedIO)
                     for net in ports:
-                        startarray.addiocell(net, FixedIO,LEDS)
+                        startarray.addiocell(net, FixedIO,LEDS,Pullups)
                     startarray.addiocell("GND", FixedIO)
                 elif words[0] == ".ENDS":
                     subckt = ""
@@ -841,24 +882,27 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 24         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 273        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 47        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
 
                         # Insert monitoring LEDs for I/O pins in list
 # LEDS        = []      # Default, don't insert any LEDs
-LEDS        = ["clk","count.0","count.1","count.2"]         
+# LEDS        = ["clk","count.0","count.1","count.2"]
+LEDS        = ["clk","dice.0","dice.1","dice.2","dice.3"]
 
+Pullups     = []      # Default, don't insert pull up resistors
+Pullups     = ["dice.0", "dice.1" , "dice.2" , "dice.3"]      
 
 # Optimizer settings. Only change when needed
 
 AreaMargin = 0.5        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
                         # Too large values will result in waste of area.
-CoarseAttempts = 2     # 20
+CoarseAttempts = 20     # 20
 CoarseCycles   = 1000   # 1000
-FineCycles     = 1000  # 10000 Increase to improve larger designs. 
+FineCycles     = 10000  # 10000 Increase to improve larger designs. 
 
 # Pitch of grid on PCB in mm
 
@@ -886,7 +930,7 @@ print("Array Xwidth: {0}\nArray Ywidth: {1}\n".format(startarray.SizeX, startarr
 
 print("=== Parsing input file & Inserting Microcells ===\n")
 
-parsesptocellarray(InputFileName,startarray,FixedIO,LEDS)
+parsesptocellarray(InputFileName,startarray,FixedIO,LEDS,Pullups)
 print("Parsing successful...")
 
 startarray.rebuildnets()
@@ -928,7 +972,7 @@ pltdata = pdframe.pivot('Y','X','Celltype')
 print(pltdata)
 pltdata.to_csv(PlacementOutputFile, sep='\t')
 
-printf("\nMicrocell counts:")
+print("\nMicrocell counts:")
 print(pdframe['Celltype'].value_counts())
 
 print("\n=== Final Nets ===\n")
