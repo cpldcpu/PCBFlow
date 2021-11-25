@@ -28,7 +28,7 @@ opt_clean
 stat -liberty ../20_SYNTH/discrete_nmos_logic_liberty.lib
 
 # Draw netlist of optimized and mapped design
-show -format pdf -prefix 208_diagramm_after_mapping
+show -format pdf -prefix 201_diagramm_after_mapping
 
 
 # Write out in spice format
