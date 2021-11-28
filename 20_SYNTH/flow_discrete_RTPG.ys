@@ -22,6 +22,8 @@ techmap
 
 proc; opt; 
 
+techmap -map ../20_SYNTH/discrete_RTPG_techmap.v   # map TBUF
+
 #proc; opt; fsm; opt; 
 dfflibmap -liberty ../20_SYNTH/discrete_RTPG_logic_liberty.lib
 abc -liberty ../20_SYNTH/discrete_RTPG_logic_liberty.lib

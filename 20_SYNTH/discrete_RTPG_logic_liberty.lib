@@ -21,6 +21,15 @@ library(SingleLogicCells) {
               function: "A"; }
   }
   
+    cell(TBUF) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(E) { direction: input; }
+    pin(Y) { direction: output;
+        function : "A";
+        three_state : "E"; }
+  }
+
   cell(NOT) {
     area: 1;
     pin(A) { direction: input; }
