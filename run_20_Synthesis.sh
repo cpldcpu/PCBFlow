@@ -20,6 +20,7 @@ if [ "$1" == "" ]; then
     echo "  amux    analog multiplexer logic"
     echo "  74LVC   74LVC single gate logic"
     echo "  YG      YG strip logic"
+    echo "  LTL     LED Transistor Logic"
     exit 1
 else
     FILE="$1"
@@ -46,6 +47,8 @@ elif [ "$APP" == "hybrid" ]; then
     echo "Synthesizing to hybrid Bipolar/nmos logic"
 elif [ "$APP" == "YG" ]; then
     echo "Synthesizing to YG strip logic"
+elif [ "$APP" == "LTL" ]; then
+    echo "Synthesizing to LED-Transistor-Logic"
 else
     echo "Unknown logic style :$APP"
     exit 1
