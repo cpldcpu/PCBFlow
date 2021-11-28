@@ -15,12 +15,16 @@ entity gatesx is
           and_y:    out std_logic;
 
 	      d,clk:	in	std_logic;
-		  q:        out std_logic
+		  q:        out std_logic;
+
+          ld,en:	in	std_logic;
+		  lq:        out std_logic
 	);
 end;
 
 architecture main of gatesx is
     signal reg: std_logic;   
+    signal latch: std_logic;   
 begin
     process (clk)
     begin
@@ -30,6 +34,15 @@ begin
     end process;
 
     q <= reg;
+
+    process(en,ld)
+    begin
+        if (en ='1') then
+            latch <= ld;
+        end if;
+    end process;
+
+    lq <= latch;
 
     and_y <= and_a AND and_b;
     xor_y <= xor_a XOR xor_b;
