@@ -61,8 +61,14 @@ always @(posedge C)
 	Q <= D;
 endmodule
 
-module am_XOR2(A, B, Y);
+module am_MUX2(A, B, S, Y);
+input A, B , S;
+output Y;
+assign Y = (A & S) | (B & ~S);
+endmodule
+
+module am_XNOR2(A, B, Y);
 input A, B;
 output Y;
-assign Y = (A ^ B);
+assign Y = ~(A ^ B);
 endmodule

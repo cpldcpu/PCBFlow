@@ -20,7 +20,9 @@ tribuf
 # Technology mapping
 techmap
 
-proc; opt; fsm; opt; 
+proc; opt; 
+
+#proc; opt; fsm; opt; 
 dfflibmap -liberty ../20_SYNTH/discrete_RTPG_logic_liberty.lib
 abc -liberty ../20_SYNTH/discrete_RTPG_logic_liberty.lib
 opt_clean
