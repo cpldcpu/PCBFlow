@@ -1,0 +1,80 @@
+/*
+  Basic logic cells for a logic family based on discrete neos transistors (neos Logic)
+  BUF
+
+Logic gates:
+  NOT
+  NAND2
+  NAND3
+  NOR2
+  NOR3
+
+D-Flop:
+  DFF
+*/
+
+
+library(SingleLogicCells) {
+  
+  cell(ne_BUF) {
+    area: 6;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A"; }
+  }
+  
+  cell(ne_NOT) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A'"; }
+  }
+
+
+  cell(ne_NAND2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B)'"; }
+  }
+
+  cell(ne_NAND3) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(C) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B*C)'"; }
+  }
+/*
+
+cell(ne_NOR2) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A+B)'"; }
+  }
+
+  cell(ne_NOR3) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(C) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A+B+C)'"; }
+  }
+*/
+
+  cell(ne_DFF) {
+    area: 2.25;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+}
