@@ -21,6 +21,7 @@ if [ "$1" == "" ]; then
     echo "  74LVC   74LVC single gate logic"
     echo "  YG      YG strip logic"
     echo "  LTL     LED Transistor Logic"
+    echo "  NE      NE555 logic"
     exit 1
 else
     FILE="$1"
@@ -49,13 +50,15 @@ elif [ "$APP" == "YG" ]; then
     echo "Synthesizing to YG strip logic"
 elif [ "$APP" == "LTL" ]; then
     echo "Synthesizing to LED-Transistor-Logic"
+elif [ "$APP" == "NE" ]; then
+    echo "Synthesizing to NE555 logic"
 else
     echo "Unknown logic style :$APP"
     exit 1
 fi
 
 cd Work
-ghdl -a ../10_HDL/$FILE.vhd
+ghdl -a --std=02 ../10_HDL/$FILE.vhd 
 yosys ../20_SYNTH/flow_discrete_$APP.ys >208_log_yosys.txt
 grep -i 'Printing' -A 28 208_log_yosys.txt
 cd ..

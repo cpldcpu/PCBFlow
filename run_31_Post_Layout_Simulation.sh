@@ -1,3 +1,4 @@
+#!/bin/bash
 # Simulated synthesized logic circuit
 # Invokes NGspice
 #  

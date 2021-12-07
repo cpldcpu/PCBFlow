@@ -1,3 +1,4 @@
+#!/bin/bash
 # Run placement 
 
 cd Work
