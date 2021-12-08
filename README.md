@@ -42,5 +42,20 @@ As a more complex example, you can see the synthesized [MCPU](https://github.com
 
 ![MCPU](Images/mcpu_routed.png)
 
+# Usage
+
+Most tools needed to implement this toolchain can be found in the [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build), including Yosys with GHDL plugin. The [nightly builds](https://github.com/YosysHQ/oss-cad-suite-build/releases) should work out-of-the-box under WSL2 and native Linux. No installation is required, other than invoking the environment with ```source environment``` in folder of the unpacked archive.
+
+See screenshot below for an example of how to invoke the OSS CAD Suite, synthesize the counter example and execute placement. The resulting files can be found in the "Work" folder. Please keep in mind that the toolchain is still highly experimental, right now the placement tool is controlled by variables defined within PCBPlace.py
+
+## Invoke Environment and Run Synthesis
+![Synthesis](Images/screenshot_synthesis.png)
+## Install missing Python Packages (optional)
+![python](Images/screenshot_pip.png)
+## Run Placement
+![placement](Images/screenshot_placement.png)
+
+
+
 
 
