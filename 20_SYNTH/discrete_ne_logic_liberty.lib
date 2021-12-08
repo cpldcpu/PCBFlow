@@ -1,5 +1,5 @@
 /*
-  Basic logic cells for a logic family based on discrete neos transistors (neos Logic)
+  Basic logic cells for a logic family based on NE555
   BUF
 
 Logic gates:
@@ -47,7 +47,7 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
              function: "(A*B*C)'"; }
   }
-/*
+
 
 cell(ne_NOR2) {
     area: 1;
@@ -65,7 +65,7 @@ cell(ne_NOR2) {
     pin(Y) { direction: output;
              function: "(A+B+C)'"; }
   }
-*/
+
 
   cell(ne_DFF) {
     area: 2.25;
