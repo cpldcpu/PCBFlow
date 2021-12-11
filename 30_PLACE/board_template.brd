@@ -65,8 +65,7 @@
                     <description>Discrete logic components</description>
                     <packages>
                         <package name="SOT23">
-                            <description>&lt;b&gt;SOT23-ren3&lt;/b&gt;&lt;br&gt;
-                            </description>
+                            <description>SOT23-3</description>
                             <smd name="1" x="-1.1" y="0.95" dx="1.05" dy="0.6" layer="1"/>
                             <smd name="2" x="-1.1" y="-0.95" dx="1.05" dy="0.6" layer="1"/>
                             <smd name="3" x="1.1" y="0" dx="1.05" dy="0.6" layer="1"/>
@@ -75,6 +74,91 @@
                             <wire x1="0.65" y1="-1.45" x2="-0.65" y2="-1.45" width="0.1" layer="51"/>
                             <wire x1="-0.65" y1="-1.45" x2="-0.65" y2="1.45" width="0.1" layer="51"/>
                             <wire x1="-0.65" y1="0.5" x2="0.3" y2="1.45" width="0.1" layer="51"/>
+                        </package>
+                        <package name="SOIC-8">
+                            <description>SOIC-8</description>
+                            <smd name="1" x="-2.405" y="1.905" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <smd name="2" x="-2.405" y="0.635" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <smd name="3" x="-2.405" y="-0.635" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <smd name="4" x="-2.405" y="-1.905" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <smd name="5" x="2.405" y="-1.905" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <smd name="6" x="2.405" y="-0.635" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <smd name="7" x="2.405" y="0.635" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <smd name="8" x="2.405" y="1.905" dx="0.66" dy="2" layer="1" rot="R270"/>
+                            <wire x1="1.95" y1="2.45" x2="1.95" y2="-2.45" width="0.127" layer="51"/>
+                            <wire x1="1.95" y1="-2.45" x2="-1.95" y2="-2.45" width="0.127" layer="51"/>
+                            <wire x1="-1.95" y1="-2.45" x2="-1.95" y2="2.45" width="0.127" layer="51"/>
+                            <wire x1="-1.95" y1="2.45" x2="1.95" y2="2.45" width="0.127" layer="51"/>
+                            <wire x1="1.95" y1="2.45" x2="-1.95" y2="2.45" width="0.127" layer="21"/>
+                            <wire x1="1.95" y1="-2.45" x2="-1.95" y2="-2.45" width="0.127" layer="21"/>
+                            <wire x1="2.15" y1="2.65" x2="-2.15" y2="2.65" width="0.05" layer="39"/>
+                            <wire x1="-2.15" y1="2.65" x2="-2.15" y2="2.435" width="0.05" layer="39"/>
+                            <wire x1="-2.15" y1="2.435" x2="-3.605" y2="2.435" width="0.05" layer="39"/>
+                            <wire x1="-3.605" y1="2.435" x2="-3.605" y2="-2.435" width="0.05" layer="39"/>
+                            <wire x1="-3.605" y1="-2.435" x2="-2.15" y2="-2.435" width="0.05" layer="39"/>
+                            <wire x1="-2.15" y1="-2.435" x2="-2.15" y2="-2.65" width="0.05" layer="39"/>
+                            <wire x1="-2.15" y1="-2.65" x2="2.15" y2="-2.65" width="0.05" layer="39"/>
+                            <wire x1="2.15" y1="-2.65" x2="2.15" y2="-2.435" width="0.05" layer="39"/>
+                            <wire x1="2.15" y1="-2.435" x2="3.605" y2="-2.435" width="0.05" layer="39"/>
+                            <wire x1="3.605" y1="-2.435" x2="3.605" y2="2.435" width="0.05" layer="39"/>
+                            <wire x1="3.605" y1="2.435" x2="2.15" y2="2.435" width="0.05" layer="39"/>
+                            <wire x1="2.15" y1="2.435" x2="2.15" y2="2.65" width="0.05" layer="39"/>
+                            <circle x="-3.9" y="1.9" radius="0.1" width="0.2" layer="21"/>
+                        </package>
+                        <package name="SOD-323">
+                            <description>SOD-323 Diode</description>
+                            <wire x1="-1" y1="0.7" x2="1" y2="0.7" width="0.1524" layer="21"/>
+                            <wire x1="1" y1="0.7" x2="1" y2="-0.7" width="0.1524" layer="51"/>
+                            <wire x1="1" y1="-0.7" x2="-1" y2="-0.7" width="0.1524" layer="21"/>
+                            <wire x1="-1" y1="-0.7" x2="-1" y2="0.7" width="0.1524" layer="51"/>
+                            <wire x1="-0.5" y1="0" x2="0.1" y2="0.4" width="0.1524" layer="21"/>
+                            <wire x1="0.1" y1="0.4" x2="0.1" y2="-0.4" width="0.1524" layer="21"/>
+                            <wire x1="0.1" y1="-0.4" x2="-0.5" y2="0" width="0.1524" layer="21"/>
+                            <smd name="C" x="-1.1" y="0" dx="0.6" dy="0.6" layer="1"/>
+                            <smd name="A" x="1.1" y="0" dx="0.6" dy="0.6" layer="1"/>
+                            <rectangle x1="-0.7" y1="-0.7" x2="-0.5" y2="0.7" layer="51"/>
+                        </package>
+                        <package name="SOD-123">
+                            <description>SOD-123 Diode</description>
+                            <smd name="C" x="-1.68" y="0" dx="1.02" dy="0.86" layer="1" roundness="51" rot="R180" stop="no" cream="no"/>
+                            <smd name="A" x="1.68" y="0" dx="1.02" dy="0.86" layer="1" roundness="51" stop="no" cream="no"/>
+                            <wire x1="-1.605" y1="0.305" x2="-1.605" y2="-0.305" width="0.025" layer="51"/>
+                            <wire x1="-1.605" y1="-0.305" x2="-1.855" y2="-0.305" width="0.025" layer="51"/>
+                            <wire x1="-1.855" y1="-0.305" x2="-1.855" y2="0.305" width="0.025" layer="51"/>
+                            <wire x1="-1.855" y1="0.305" x2="-1.605" y2="0.305" width="0.025" layer="51"/>
+                            <wire x1="1.605" y1="-0.305" x2="1.605" y2="0.305" width="0.025" layer="51"/>
+                            <wire x1="1.605" y1="0.305" x2="1.855" y2="0.305" width="0.025" layer="51"/>
+                            <wire x1="1.855" y1="0.305" x2="1.855" y2="-0.305" width="0.025" layer="51"/>
+                            <wire x1="1.855" y1="-0.305" x2="1.605" y2="-0.305" width="0.025" layer="51"/>
+                            <wire x1="-1.42" y1="-0.9" x2="-1.42" y2="0.9" width="0.12" layer="51"/>
+                            <wire x1="-1.42" y1="0.9" x2="1.42" y2="0.9" width="0.12" layer="51"/>
+                            <wire x1="1.42" y1="0.9" x2="1.42" y2="-0.9" width="0.12" layer="51"/>
+                            <wire x1="1.42" y1="-0.9" x2="-1.42" y2="-0.9" width="0.12" layer="51"/>
+                            <wire x1="-1.42" y1="0.61" x2="-1.42" y2="0.9" width="0.12" layer="21"/>
+                            <wire x1="1.42" y1="-0.61" x2="1.42" y2="-0.9" width="0.12" layer="21"/>
+                            <wire x1="0.35" y1="0" x2="-0.35" y2="0" width="0.05" layer="39"/>
+                            <wire x1="0" y1="0.35" x2="0" y2="-0.35" width="0.05" layer="39"/>
+                            <wire x1="1.42" y1="-0.9" x2="-1.42" y2="-0.9" width="0.12" layer="21"/>
+                            <wire x1="-1.42" y1="-0.9" x2="-1.42" y2="-0.61" width="0.12" layer="21"/>
+                            <wire x1="-1.42" y1="0.9" x2="1.42" y2="0.9" width="0.12" layer="21"/>
+                            <wire x1="1.42" y1="0.9" x2="1.42" y2="0.61" width="0.12" layer="21"/>
+                            <wire x1="-1.62" y1="-1.1" x2="1.62" y2="-1.1" width="0.05" layer="39"/>
+                            <wire x1="1.62" y1="-1.1" x2="1.62" y2="-0.63" width="0.05" layer="39"/>
+                            <wire x1="1.62" y1="-0.63" x2="2.39" y2="-0.63" width="0.05" layer="39"/>
+                            <wire x1="2.39" y1="-0.63" x2="2.39" y2="0.63" width="0.05" layer="39"/>
+                            <wire x1="2.39" y1="0.63" x2="1.62" y2="0.63" width="0.05" layer="39"/>
+                            <wire x1="1.62" y1="0.63" x2="1.62" y2="1.1" width="0.05" layer="39"/>
+                            <wire x1="1.62" y1="1.1" x2="-1.62" y2="1.1" width="0.05" layer="39"/>
+                            <wire x1="-1.62" y1="1.1" x2="-1.62" y2="0.63" width="0.05" layer="39"/>
+                            <wire x1="-1.62" y1="0.63" x2="-2.39" y2="0.63" width="0.05" layer="39"/>
+                            <wire x1="-2.39" y1="0.63" x2="-2.39" y2="-0.63" width="0.05" layer="39"/>
+                            <wire x1="-2.39" y1="-0.63" x2="-1.62" y2="-0.63" width="0.05" layer="39"/>
+                            <wire x1="-1.62" y1="-0.63" x2="-1.62" y2="-1.1" width="0.05" layer="39"/>
+                            <wire x1="0.25" y1="0.25" x2="0.25" y2="-0.25" width="0.05" layer="21"/>
+                            <wire x1="0.25" y1="-0.25" x2="-0.25" y2="0" width="0.05" layer="21"/>
+                            <wire x1="-0.25" y1="0" x2="0.25" y2="0.25" width="0.05" layer="21"/>
+                            <wire x1="-0.25" y1="0.25" x2="-0.25" y2="-0.25" width="0.05" layer="21"/>
+                            <circle x="0" y="0" radius="0.25" width="0.05" layer="39"/>
                         </package>
                         <package name="1X01">
                             <description>Pin Header</description>
@@ -160,7 +244,7 @@
                             <rectangle x1="-0.275" y1="-0.65" x2="-0.175" y2="-0.55" layer="51"/>
                             <rectangle x1="0.175" y1="-0.65" x2="0.275" y2="-0.55" layer="51"/>
                             <rectangle x1="-0.125" y1="0" x2="0.125" y2="0.25" layer="21"/>
-                        </package>                    
+                        </package>
                     </packages>
                 </library>
             </libraries>

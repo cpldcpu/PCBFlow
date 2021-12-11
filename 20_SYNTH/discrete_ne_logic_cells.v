@@ -22,12 +22,17 @@ output Y;
 assign Y = ~(A & B);
 endmodule
 
-module ne_NAND3(A, B, C,Y);
+module ne_NAND3(A, B, C, Y);
 input A, B, C;
 output Y;
 assign Y = ~(A & B & C);
 endmodule
 
+module ne_NAND4(A, B, C, D, Y);
+input A, B, C, D;
+output Y;
+assign Y = ~(A & B & C & D);
+endmodule
 
 module ne_NOR2(A, B, Y);
 input A, B;

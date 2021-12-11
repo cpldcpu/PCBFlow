@@ -10,6 +10,7 @@ import random
 import time
 import sys
 import math
+from typing import ValuesView
 import numpy as np
 from copy import deepcopy
 import pandas as pd
@@ -135,8 +136,6 @@ class PCBPlacer():
 
         self.devcounter += 1
 
-
-
     def insertTBUFe(self,x, y, netenable, netin, netout, cellname="void"):
         """Insert RTL inverter with base tap at position x,y
         Assumes standard library with transistor and resistor
@@ -167,7 +166,7 @@ class PCBPlacer():
         self.devcounter += 1        
 
     def insertTBUFc(self,x, y, netenable, netin, netout, cellname="void"):
-        """Insert RTL inverter with base tap at position x,y
+        """Insert NPN transmission gate at position x,y
         Assumes standard library with transistor and resistor
         supply nets are VCC and GND."""
 
@@ -194,7 +193,6 @@ class PCBPlacer():
         self.addcontact("B$" + str(self.devcounter), "Rb"+cellname, "2")
 
         self.devcounter += 1        
-
 
     def insertNMOSinv(self,x, y, netin, netdrain, netsource, cellname="void"):
         """Insert NMOS inverter with base tap at position x,y
@@ -239,7 +237,6 @@ class PCBPlacer():
 
         self.addcontact(netgate , "Q"+cellname , "1")
         self.addcontact(netgate , "Rb"+cellname, "2")
-
 
     def insertAMUX(self,x, y, netB1, netB2, netS, netout, cellname="", cap=True):
         """Insert analog multiplexer 74LVC1G3157
@@ -303,6 +300,76 @@ class PCBPlacer():
         self.addcontact(netoutq , "Q"+cellname, "4" )
         self.addcontact('VCC'   , "Q"+cellname, "5" )
         self.addcontact(netclrn , "Q"+cellname, "6" )
+
+    def insertNE555not(self, x, y, netin, netout, cellname=""):
+        """Insert NE555 logic inverter """
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOIC-8", value="NE555", x=str(x+1.6), y=str(y+3.7),rot="R90")
+        self.countcomponent("NE555")
+
+        self.addcontact('GND'   , "Q"+cellname, "1" ) # GND
+        self.addcontact(netin   , "Q"+cellname, "2" ) # TRIG
+        self.addcontact(netout  , "Q"+cellname, "3" ) # OUT
+        self.addcontact('VCC'   , "Q"+cellname, "4" ) # RESET
+#        self.addcontact(''     , "Q"+cellname, "5" ) # CONT
+        self.addcontact(netin   , "Q"+cellname, "6" ) # THRESH
+#        self.addcontact(''     , "Q"+cellname, "7" ) # DISCH
+        self.addcontact('VCC'   , "Q"+cellname, "8" ) # VCC
+
+        # always insert cap
+        et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x-1.8), y=str(y+3.7),rot="R90")
+        self.countcomponent("cap")
+        self.addcontact('VCC'  , "C"+cellname, "2" )
+        self.addcontact('GND'  , "C"+cellname, "1" )        
+
+    def insertNE555wand(self, x, y, netins, netout, cellname=""):
+        """Insert wired and for NE555 logic """
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "R"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+3.25), y=str(y+6.1),rot="R90" )
+        self.countcomponent("resistor")
+        self.addcontact(netout , "R"+cellname, "1" )
+        self.addcontact('VCC'  , "R"+cellname, "2" )
+
+        xofs=0
+        num=0
+        for curnet in netins:
+            et.SubElement(n_elements, 'element', name = "D"+cellname+str(num), library="discrete_logic_components", package="SOD-323", value="1N4148WS", x=str(x+0.75), y=str(y+1+3*1.75-xofs))
+            self.countcomponent("diode")
+            self.addcontact(netout , "D"+cellname+str(num), "A" )
+            self.addcontact(curnet , "D"+cellname+str(num), "C" )
+            self.devcounter += 1 
+            xofs = xofs + 1.75
+            num = num + 1
+
+    def insertNE555tbuf(self,x, y, netenable, netin, netout, cellname="void"):
+        """Insert npn transmission gate at position x,y. Voltage divider at output"""
+
+        y = y + 1.3 # center cell
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname  , library="discrete_logic_components", package="SOT23"  , value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Rb"+cellname , library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
+        et.SubElement(n_elements, 'element', name = "Rl"+cellname , library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1.65+2.5), y=str(y+1.4+2.1),rot="R90")
+        et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1.65+2.5), y=str(y+1.4-0.3),rot="R90")
+        self.countcomponent("npn transistor")
+        self.countcomponent("resistor",3)
+
+        self.addcontact(netin , "Q"+cellname  , "3" )
+        self.addcontact('VCC' , "Rl"+cellname , "2" )
+        self.addcontact('GND' , "Rl2"+cellname, "1" )
+
+        self.addcontact(netout , "Rl2"+cellname, "2" )
+
+        self.addcontact(netout    , "Rl"+cellname, "1" )
+        self.addcontact(netenable , "Rb"+cellname, "1" )
+
+        self.addcontact(netout , "Q"+cellname, "2")
+
+        self.addcontact("B$" + str(self.devcounter), "Q"+cellname, "1")
+        self.addcontact("B$" + str(self.devcounter), "Rb"+cellname, "2")
+
+        self.devcounter += 1        
 
     def insertIO(self,x, y, netin, name ="", pullup=False):
         """Insert I/O pin at position x,y"""
@@ -414,6 +481,14 @@ class CellArray():
         # LED
             elif celltype == 'LED':
                 board.insertLED(val.y*pitchx,val.x*pitchy,val.pin[0],key)
+        # NE555
+#            def insertNE555tbuf(self,x, y, netenable, netin, netout, cellname="void"):
+            elif celltype == 'ne_NOT':
+                board.insertNE555not(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
+            elif celltype == 'ne_WAND2' or celltype == 'ne_WAND3' or celltype == 'ne_WAND4':
+                board.insertNE555wand(val.y*pitchx,val.x*pitchy, val.pin[:-1], val.pin[-1], key)
+            elif celltype == 'ne_TBUF':
+                board.insertNE555tbuf(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
             else:
                 print("Failed to insert footprint of cell {0}, type unknown\t".format(key), end="")
                 print(celltype)
@@ -648,11 +723,36 @@ class CellArray():
             self.addlogiccell(name+"X1","TBUFe" , [nets[0]   , nets[1]   , name+"X1o" ])   
             self.addlogiccell(name+"X2","NMg"   , [name+"X3o", name+"X1o", nets[2]    ])
             self.addlogiccell(name+"X3","nm_NOT", [nets[2]   , name+"X3o"             ])    
-
+        # NE555 Logic
+        # Macrocells correspond to microcells -> direct insertion of ne_NOT
+        # elif celltype == "ne_NOT":  # pin order: E, D, Q
+        #     self.insertcell(name ,"ne_NOT"         ,   [nets[0] , nets[1] ])
+        elif celltype == "ne_NAND2":
+            self.insertcell(name+"a" ,"ne_WAND2"    ,   [nets[0] , nets[1]  , name+"!" ])
+            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[2]  ])
+        elif celltype == "ne_NAND3":
+            self.insertcell(name+"a" ,"ne_WAND3"    ,   [nets[0] , nets[1]  , nets[2]  , name+"!" ])
+            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[3]  ])
+        elif celltype == "ne_NAND4":
+            self.insertcell(name+"a" ,"ne_WAND4"    ,   [nets[0] , nets[1]  , nets[2]  , nets[3]  , name+"!" ])
+            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[4]  ])
+        elif celltype == "ne_LATCH": # pin order: E, D, Q
+            self.insertcell(name+"a" ,"ne_TBUF"    ,   [nets[0] , nets[1]  , name+"!" ])
+            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[2]  ])
+        elif celltype == "ne_DFF":  # pin order: C, D, Q
+            # Use common nclk net name to force removal of redundant inverters. Works in NE555 logic due to push/pull driver
+            self.addlogiccell(name+"c","ne_NOT", [nets[0], "n_" + nets[0]])             # clock inversion
+            self.addlogiccell(name+"a","ne_LATCH", ["n_" + nets[0], nets[1], name+"DI!"])  # pin order: E, D, Q
+            self.addlogiccell(name+"b","ne_LATCH", [nets[0], name+"DI!", nets[2]])  # pin order: E, D, Q
         else:
             self.insertcell(name,celltype, nets)
 
     def insertcell(self,name,celltype, nets):
+        for key, val in self.array.items():
+            if val.type == celltype and val.pin == nets:
+                print ("Skipping functionally redundant Microcell: {0} {1} ".format(celltype, nets))
+                return                    
+
         for key, val in self.array.items():
             if val.type == "EMPTY" and val.y > 0:
 #                print(name,nets)
@@ -712,8 +812,12 @@ class CellArray():
                 ymin = ymin if self.array[currentcell].y>ymin else self.array[currentcell].y
                 ymax = ymax if self.array[currentcell].y<ymax else self.array[currentcell].y
 
-            netlength=3*(xmax-xmin)+ymax-ymin 
-            self.nets[netname][0] = netlength
+            HPWL = 2*(xmax-xmin)+ymax-ymin # priorize horizontal connections
+
+            if netname[-1] == '!':
+                HPWL = HPWL * 3        # priorize internal connections
+
+            self.nets[netname][0] = HPWL
         else:                       # old algorithm, manhattan spanning tree
             lastcell = cells[-1]        
             segments = []
@@ -882,32 +986,35 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 8         # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 47        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 14        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 60        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
 
                         # Insert monitoring LEDs for I/O pins in list
-# LEDS        = []      # Default, don't insert any LEDs
+LEDS        = []      # Default, don't insert any LEDs
 # LEDS        = ["clk","count.0","count.1","count.2"]
-LEDS        = ["clk","dice.0","dice.1","dice.2","dice.3"]
+# LEDS        = ["clk","dice.0","dice.1","dice.2","dice.3"]
 
 Pullups     = []      # Default, don't insert pull up resistors
-Pullups     = ["dice.0", "dice.1" , "dice.2" , "dice.3"]      
+# Pullups     = ["dice.0", "dice.1" , "dice.2" , "dice.3"]      
 
 # Optimizer settings. Only change when needed
 
-AreaMargin = 0.5        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
-                        # Too large values will result in waste of area.
-CoarseAttempts = 20     # 20
-CoarseCycles   = 1000   # 1000
-FineCycles     = 10000  # 10000 Increase to improve larger designs. 
+AreaMargin = 0.3        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
+                        # Too large values will result in waste of area. Default: 0.3
+CoarseAttempts = 20     # Default: 20
+CoarseCycles   = 1000   # Default: 1000
+FineCycles     = 10000  # Default: 10000 Increase to improve larger designs. 
 
 # Pitch of grid on PCB in mm
 
-PCBPitchx = 2.54*2 # default 5
-PCBPitchy = 2.54*3 # default 7
+PCBPitchx = 2.54*2 # default 2*2.54
+PCBPitchy = 2.54*3 # default 3*2.54
+
+# PCBPitchx = 2.54*3 # NE555 logic
+# PCBPitchy = 2.54*4 # 
 
 # File names. Don't touch unless you want to modify the flow
 
