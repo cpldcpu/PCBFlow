@@ -259,9 +259,7 @@
                 </class>
             </classes>
             <designrules name="JLPCB_selfmade_v2">
-                <description language="en">
-Please make sure your boards conform to these design rules.
-                </description>
+                <description language="en"> Please make sure your boards conform to these design rules.</description>
                 <param name="layerSetup" value="(1*16)"/>
                 <param name="mtCopper" value="0.035559375mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.0356mm 0.035559375mm"/>
                 <param name="mtIsolate" value="1.6mm 0.1499mm 0.2007mm 0.1499mm 0.2007mm 0.1499mm 0.2007mm 0.1499mm 0.2007mm 0.1499mm 0.2007mm 0.1499mm 0.2007mm 0.1499mm 0.2007mm"/>
@@ -326,11 +324,6 @@ Please make sure your boards conform to these design rules.
                 <param name="checkAngle" value="0"/>
                 <param name="checkFont" value="1"/>
                 <param name="checkRestrict" value="1"/>
-                <param name="checkStop" value="0"/>
-                <param name="checkValues" value="0"/>
-                <param name="checkNames" value="1"/>
-                <param name="checkWireStubs" value="1"/>
-                <param name="checkPolygonWidth" value="0"/>
                 <param name="useDiameter" value="13"/>
                 <param name="maxErrors" value="50"/>
             </designrules>
@@ -434,13 +427,6 @@ Please make sure your boards conform to these design rules.
             </elements>
             <signals>
             </signals>
-            <mfgpreviewcolors>
-                <mfgpreviewcolor name="soldermaskcolor" color="0xC8008000"/>
-                <mfgpreviewcolor name="silkscreencolor" color="0xFFFEFEFE"/>
-                <mfgpreviewcolor name="backgroundcolor" color="0xFF282828"/>
-                <mfgpreviewcolor name="coppercolor" color="0xFFFFBF00"/>
-                <mfgpreviewcolor name="substratecolor" color="0xFF786E46"/>
-            </mfgpreviewcolors>
         </board>
     </drawing>
 </eagle>

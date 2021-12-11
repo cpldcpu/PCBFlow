@@ -22,7 +22,7 @@ GHDL_FLAGS  	= --ieee=synopsys -fexplicit -Whide
 GHDL_SIM_FLAGS 	= --stop-time=100us --ieee-asserts=disable # Hide ieee library asserts 
 
 #GTKWAVE CONFIG
-GTKWAVE_CMD	 	= gtkwave
+GTKWAVE_CMD	 	= gtkwave.exe
 GTKWAVE_FLAGS   = gtkviewsettings.gtkw --rcvar 'fontname_signals Monospace 11' --rcvar 'fontname_waves Monospace 11' # font size
 
 .PHONY: clean
