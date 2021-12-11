@@ -44,7 +44,7 @@ As a more complex example, you can see the synthesized [MCPU](https://github.com
 
 # Usage
 
-Most tools needed to implement this toolchain can be found in the [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build), including Yosys with GHDL plugin. The [nightly builds](https://github.com/YosysHQ/oss-cad-suite-build/releases) should work out-of-the-box under WSL2 and native Linux. No installation is required, other than invoking the environment with ```source environment``` in folder of the unpacked archive.
+Most tools needed to implement this toolchain can be found in the [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build), including Yosys with GHDL plugin. The [nightly builds](https://github.com/YosysHQ/oss-cad-suite-build/releases) should work out-of-the-box under WSL2 and native Linux. No installation is required, other than invoking the environment with ```source environment``` in the folder where you unpacked the archive.
 
 Viewing graphical output of NgSpice or GTKWave under Windows in WSL2 requires an XServer. I am using [VcXsrv](https://sourceforge.net/projects/vcxsrv/).
 
