@@ -5,6 +5,11 @@
 ghdl
 hierarchy -check
 
+# Identify top and flatten hierarchy 
+hierarchy -auto-top
+flatten
+
+
 # Read verilog description of cells
 read_verilog -lib ../20_SYNTH/discrete_nmos_logic_cells.v
 read_verilog -lib ../20_SYNTH/discrete_hybrid_logic_cells.v
