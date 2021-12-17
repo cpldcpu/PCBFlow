@@ -4,8 +4,6 @@
 ghdl
 hierarchy -check
 
-# Identify top and flatten hierarchy 
-hierarchy -auto-top
 flatten
 
 # Read verilog description of cells

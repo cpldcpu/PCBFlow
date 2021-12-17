@@ -3,9 +3,6 @@
 # elaborate VHDL code from GHDL
 ghdl
 hierarchy -check
-
-# Identify top and flatten hierarchy 
-hierarchy -auto-top
 flatten
 
 # Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
@@ -13,7 +10,6 @@ rename -top main
 
 # Read verilog description of cells
 read_verilog -lib ../20_SYNTH/discrete_ne_logic_cells.v
-
 
 # Draw netlist of elaborated design
 show -format pdf -prefix 200_diagramm_hdl_elaborated
@@ -37,5 +33,5 @@ show -format pdf -prefix 201_diagramm_after_mapping
 
 # Write out in spice format
 write_spice 209_synthesized_output.sp
-
+write_json  210_json.json
 

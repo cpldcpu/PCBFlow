@@ -5,8 +5,6 @@
 ghdl
 hierarchy -check
 
-# Identify top and flatten hierarchy 
-hierarchy -auto-top
 flatten
 
 # Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
