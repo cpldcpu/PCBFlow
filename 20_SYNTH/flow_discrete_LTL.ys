@@ -24,7 +24,7 @@ techmap
 proc; opt; fsm; opt; 
 dfflibmap -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
 abc -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
-opt_clean
+opt_clean -purge
 
 # Print Statistics
 stat -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
@@ -34,6 +34,8 @@ show -format pdf -prefix 201_diagramm_after_mapping
 
 
 # Write out in spice format
-write_spice 209_synthesized_output.sp
+write_spice -inames 209_synthesized_output.sp
+write_json  210_synthesized_output.json
+
 
 
