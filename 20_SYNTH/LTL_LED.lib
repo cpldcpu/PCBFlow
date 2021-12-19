@@ -1,0 +1,8 @@
+
+* LED Models for LTL
+
+* Base LED (Green)
+.MODEL LEDW D(Cjo=40p IS=3.9447E-12 N=4.9950 RS=16.382 Iave=30m Vpk=5)
+
+* Wired and LED (Red)
+.MODEL LEDR D(Cjo=40p IS=2.6432E-24 N=1.4571 RS=2.0918 IKF=3.9036E-3 Iave=30m Vpk=5)

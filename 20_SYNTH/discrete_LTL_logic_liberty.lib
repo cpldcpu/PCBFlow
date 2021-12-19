@@ -25,7 +25,7 @@ library(SingleLogicCells) {
   }
   
   cell(ltl_NOT) {
-    area: 1;
+    area: 2;
     pin(A) { direction: input; }
     pin(Y) { direction: output;
               function: "A'"; }
@@ -33,7 +33,7 @@ library(SingleLogicCells) {
 
 
   cell(ltl_NAND2) {
-    area: 1;
+    area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(Y) { direction: output;
@@ -41,7 +41,7 @@ library(SingleLogicCells) {
   }
 
   cell(ltl_NAND3) {
-    area: 1;
+    area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(C) { direction: input; }
@@ -50,7 +50,7 @@ library(SingleLogicCells) {
   }
 
 cell(ltl_NAND4) {
-    area: 1;
+    area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(C) { direction: input; }
@@ -58,9 +58,9 @@ cell(ltl_NAND4) {
              function: "(A*B*C)'"; }
   }
 
-
+/*
   cell(ltl_AOI2_2) {
-    area: 2;
+    area: 4;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(C) { direction: input; }
@@ -70,7 +70,7 @@ cell(ltl_NAND4) {
   }
 
 cell(ltl_AOI1_2) {
-    area: 2;
+    area: 4;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(C) { direction: input; }
@@ -79,7 +79,7 @@ cell(ltl_AOI1_2) {
   }
 
 cell(ltl_AOI2_2_2) {
-    area: 3;
+    area: 6;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(C) { direction: input; }
@@ -91,7 +91,7 @@ cell(ltl_AOI2_2_2) {
   }
 
 cell(ltl_NOR2) {
-    area: 2;
+    area: 4;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(Y) { direction: output;
@@ -99,13 +99,14 @@ cell(ltl_NOR2) {
   }
 
   cell(ltl_NOR3) {
-    area: 3;
+    area: 6;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(C) { direction: input; }
     pin(Y) { direction: output;
              function: "(A+B+C)'"; }
   }
+*/
 /*
   cell(ltl_XOR2) {
     area: 3;
@@ -115,8 +116,10 @@ cell(ltl_NOR2) {
              function: "(A^B)"; }
   }
 */
+
+/*
   cell(ltl_DFF) {
-    area: 7;
+    area: 12;
     ff(IQ, IQN) { clocked_on: C;
                   next_state: D; }
     pin(C) { direction: input;
@@ -124,5 +127,22 @@ cell(ltl_NOR2) {
     pin(D) { direction: input; }
     pin(Q) { direction: output;
               function: "IQ"; }
+   }
   }
+*/
+  cell(ltl_DFFNP) {
+    area: 12;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+   }
+  }
+
+
 }

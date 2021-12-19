@@ -11,6 +11,7 @@ Vcc Vcc 0 DC 5
 .include ../20_SYNTH/2N7002.lib
 * .include ../20_SYNTH/PMBT2369.lib
 .include ../20_SYNTH/PMBT3904.lib
+.include ../20_SYNTH/LTL_LED.lib
 .include ../20_SYNTH/amux.lib
 .include 308_extracted_netlist.sp
 

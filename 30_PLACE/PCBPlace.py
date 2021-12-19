@@ -102,6 +102,68 @@ class PCBPlacer():
 
         self.devcounter += 1
 
+
+    def insertLTLNOTo(self,x, y, netin, netout, cellname="void"):
+        """Insert LTL inverter with open collector at position x,y
+        Assumes standard library with transistor and resistor
+        supply nets are VCC and GND."""
+
+        self.insertLTLNOTb(x,y,netin, "B$" + str(self.devcounter), netout, cellname, rload=False)
+        self.devcounter += 1
+
+    def insertLTLNOTs(self,x, y, netin, netout, cellname="void"):
+        """Insert LTL inverter at position x,y
+        Assumes standard library with transistor and resistor
+        supply nets are VCC and GND."""
+
+        self.insertLTLNOTb(x,y,netin, "B$" + str(self.devcounter), netout, cellname)
+        self.devcounter += 1
+
+    def insertLTLNOTb(self,x, y, netin, netbase, netout, cellname="void", rload=True):
+        """Insert LTL inverter with base tap at position x,y
+        Assumes standard library with transistor and resistor
+        supply nets are VCC and GND."""
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "L"+cellname, library="discrete_logic_components", package="LED0603", value="LEDW", x=str(x+1.17), y=str(y+3.63) ,rot="R270")
+        self.countcomponent("npn transistor")
+        self.countcomponent("led")
+
+        if rload:
+            et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RESL", x=str(x+2.94), y=str(y+3.16),rot="R90")
+            self.addcontact('VCC' , "Rl"+cellname, "2" )
+            self.addcontact(netout , "Rl"+cellname, "1" )
+            self.countcomponent("resistor")
+
+        self.addcontact('GND' , "Q"+cellname, "2" )
+        self.addcontact(netout , "Q"+cellname, "3")
+
+        self.addcontact(netin, "L"+cellname, "A")
+        self.addcontact(netbase, "Q"+cellname, "1")
+        self.addcontact(netbase, "L"+cellname, "C")
+
+        self.devcounter += 1
+
+    def insertLTLwand(self, x, y, netins, netout, cellname=""):
+        """Insert wired and for LTL logic """
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "R"+cellname, library="discrete_logic_components", package="RES0402", value="RESB", x=str(x+1.17+1.77), y=str(y+6.1-2.92),rot="R90" )
+        self.countcomponent("resistor")
+        self.addcontact(netout , "R"+cellname, "1" )
+        self.addcontact('VCC'  , "R"+cellname, "2" )
+
+        positions = [0 * 1.14, 2 * 1.14, 3 * 1.14, 1 * 1.14,]
+        num=0
+        for curnet in netins:
+            et.SubElement(n_elements, 'element', name = "L"+cellname+str(num), library="discrete_logic_components", package="LED0603", value="LEDR", x=str(x+1.17), y=str(y+3.63-positions[num]) ,rot="R90")
+            self.countcomponent("led")
+            self.addcontact(netout , "L"+cellname+str(num), "A" )
+            self.addcontact(curnet , "L"+cellname+str(num), "C" )
+            self.devcounter += 1 
+            num = num + 1
+
     def insertNOT(self,x, y, netin, netout, cellname="void"):
         """Insert RTL inverter at position x,y
         Assumes standard library with transistor and resistor
@@ -322,6 +384,29 @@ class PCBPlacer():
         self.addcontact('VCC'  , "C"+cellname, "2" )
         self.addcontact('GND'  , "C"+cellname, "1" )        
 
+    def insertNE555andn2(self, x, y, netina, netinb, netout, cellname=""):
+        """Insert NE555 logic inverter """
+
+        n_elements = self.n_board.find('elements')
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOIC-8", value="NE555", x=str(x+1.6), y=str(y+3.7),rot="R90")
+        self.countcomponent("NE555")
+
+        self.addcontact('GND'   , "Q"+cellname, "1" ) # GND
+        self.addcontact(netinb  , "Q"+cellname, "2" ) # TRIG
+        self.addcontact(netout  , "Q"+cellname, "3" ) # OUT
+        self.addcontact(netinb  , "Q"+cellname, "4" ) # RESET
+#        self.addcontact(''     , "Q"+cellname, "5" ) # CONT
+        self.addcontact(netinb  , "Q"+cellname, "6" ) # THRESH
+#        self.addcontact(''     , "Q"+cellname, "7" ) # DISCH
+        self.addcontact('VCC'   , "Q"+cellname, "8" ) # VCC
+
+        # always insert cap
+        et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x-1.8), y=str(y+3.7),rot="R90")
+        self.countcomponent("cap")
+        self.addcontact('VCC'  , "C"+cellname, "2" )
+        self.addcontact('GND'  , "C"+cellname, "1" )        
+
+
     def insertNE555wand(self, x, y, netins, netout, cellname=""):
         """Insert wired and for NE555 logic """
 
@@ -414,6 +499,7 @@ class Cell:
     moveable:    bool
     x:           int
     y:           int
+    geometry:    str   # horizontal, center, input
     pin:         list
 class CellArray():
     def __init__(self, SizeX=0, SizeY=0 ):
@@ -423,7 +509,7 @@ class CellArray():
         self.SizeY = SizeY
         for y in range(SizeY):
             for x in range(SizeX):
-                self.array["V"+str(x+SizeX*y)]=Cell('EMPTY',True,x,y,[])
+                self.array["V"+str(x+SizeX*y)]=Cell('EMPTY',True,x,y,'',[])
 
     # copy content of another CellArray
     def clone(self, source):
@@ -484,10 +570,21 @@ class CellArray():
 #            def insertNE555tbuf(self,x, y, netenable, netin, netout, cellname="void"):
             elif celltype == 'ne_NOT':
                 board.insertNE555not(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
-            elif celltype == 'ne_WAND2' or celltype == 'ne_WAND3' or celltype == 'ne_WAND4':
+            elif celltype == 'ne_ANDN2':
+                board.insertNE555andn2(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
+            elif celltype == 'ne_WAND1' or celltype == 'ne_WAND2' or celltype == 'ne_WAND3' or celltype == 'ne_WAND4':
                 board.insertNE555wand(val.y*pitchx,val.x*pitchy, val.pin[:-1], val.pin[-1], key)
             elif celltype == 'ne_TBUF':
                 board.insertNE555tbuf(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
+        # LTL                
+            elif celltype == 'ltl_NOTo':
+                board.insertLTLNOTo(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
+            elif celltype == 'ltl_NOTs':
+                board.insertLTLNOTs(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
+            elif celltype == 'ltl_NOTb':
+                board.insertLTLNOTb(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
+            elif celltype == 'ltl_WAND1' or celltype == 'ltl_WAND2' or celltype == 'ltl_WAND3' or celltype == 'ltl_WAND4':
+                board.insertLTLwand(val.y*pitchx,val.x*pitchy, val.pin[:-1], val.pin[-1], key)
             else:
                 print("Failed to insert footprint of cell {0}, type unknown\t".format(key), end="")
                 print(celltype)
@@ -534,7 +631,7 @@ class CellArray():
     # return pandas dataframe
     def returnpdframe(self):
         df=pd.DataFrame.from_dict(self.array, orient='index')
-        df.columns =['Celltype','Movable','X','Y','Nets']
+        df.columns =['Celltype','Movable','X','Y','geometry','Nets']
         return df
 
     # I/O cells are added to row 0 by definition for now
@@ -549,13 +646,13 @@ class CellArray():
                 if net in FixedIO:
                     if val.x==FixedIO.index(net):
                         del self.array[key]
-                        self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y, [net])
+                        self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
                         if net in LEDS:
                             self.addled(net,val.x,val.y+1)
                         return
                 elif val.x>=len(FixedIO):
                     del self.array[key]
-                    self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y, [net])
+                    self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
                     if net in LEDS:
                         self.addled(net,val.x,val.y+1)
                     return  
@@ -566,7 +663,7 @@ class CellArray():
         for key, val in self.array.items():
             if val.type == "EMPTY" and val.x == x and val.y == y:
                 del self.array[key]
-                self.array["XLED"+str(val.x)] = Cell('LED', False, val.x, val.y, [net])                
+                self.array["XLED"+str(val.x)] = Cell('LED', False, val.x, val.y,'input', [net])                
                 return
         raise CAParsingError("Could not insert LED cell for NET: "+str(net))
         
@@ -724,8 +821,10 @@ class CellArray():
             self.addlogiccell(name+"X3","nm_NOT", [nets[2]   , name+"X3o"             ])    
         # NE555 Logic
         # Macrocells correspond to microcells -> direct insertion of ne_NOT
-        # elif celltype == "ne_NOT":  # pin order: E, D, Q
-        #     self.insertcell(name ,"ne_NOT"         ,   [nets[0] , nets[1] ])
+        elif celltype == "ne_NOT":  
+           self.insertcell(name ,"ne_NOT"         ,   [nets[0] , nets[1] ])
+            # self.insertcell(name+"a" ,"ne_WAND1"    ,   [nets[0] , name+"!" ])
+            # self.insertcell(name+"b" ,"ne_NOT"      ,   [name+"!", nets[1]  ])
         elif celltype == "ne_NAND2":
             self.insertcell(name+"a" ,"ne_WAND2"    ,   [nets[0] , nets[1]  , name+"!" ])
             self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[2]  ])
@@ -740,13 +839,43 @@ class CellArray():
             self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[2]  ])
         elif celltype == "ne_DFF":  # pin order: C, D, Q
             # Use common nclk net name to force removal of redundant inverters. Works in NE555 logic due to push/pull driver
-            self.addlogiccell(name+"c","ne_NOT", [nets[0], "n_" + nets[0]])             # clock inversion
+            # Do not insert clock inverter. NE555 designs requires two phase clock! 
+            # self.insertcell(name+"c","ne_NOT", [nets[0], "n_" + nets[0]])             # clock inversion
             self.addlogiccell(name+"a","ne_LATCH", ["n_" + nets[0], nets[1], name+"DI!"])  # pin order: E, D, Q
             self.addlogiccell(name+"b","ne_LATCH", [nets[0], name+"DI!", nets[2]])  # pin order: E, D, Q
+        # LTL
+        elif celltype == "ltl_NOT":  
+            self.insertcell(name+"a" ,"ltl_WAND1"   ,   [nets[0] , name+"i!" ])
+            self.insertcell(name+"b" ,"ltl_NOTs"    ,   [name+"i!", nets[1]  ])
+        elif celltype == "ltl_NAND2":  
+            self.insertcell(name+"a" ,"ltl_WAND2"   ,   [nets[0] , nets[1]  , name+"i!" ])
+            self.insertcell(name+"b" ,"ltl_NOTs"    ,   [name+"i!", nets[2]  ])
+        elif celltype == "ltl_NAND3":
+            self.insertcell(name+"a" ,"ltl_WAND3"   ,   [nets[0] , nets[1]  , nets[2]  , name+"i!" ])
+            self.insertcell(name+"b" ,"ltl_NOTs"    ,   [name+"i!", nets[3]  ])
+        elif celltype == "ltl_NAND4":
+            self.insertcell(name+"a" ,"ltl_WAND4"   ,   [nets[0] , nets[1]  , nets[2]  , nets[3]  , name+"i!" ])
+            self.insertcell(name+"b" ,"ltl_NOTs"    ,   [name+"i!", nets[4]  ])
+        elif celltype == "ltl_LATCH3Tn":  # pin order: E, D, Q
+            self.addlogiccell(name+"a","TBUFc" , [nets[0]   , nets[1]   , name+"X1o!" ])   
+            self.addlogiccell(name+"b","ltl_NOTb"  , [name+"X3o!", name+"X1o!", nets[2]    ])
+            self.addlogiccell(name+"c","ltl_NOTs"   , [nets[2]   , name+"X3o!"             ])    
+        # elif celltype == "ltl_DFF":  # pin order: C, D, Q
+        #     self.addlogiccell(name+"c","ltl_NOT", [nets[0], name+"CI"])   # clock inversion
+            # self.addlogiccell(name+"a","ltl_LATCH3Tn", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
+            # self.addlogiccell(name+"b","ltl_LATCH3Tn", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
+        elif celltype == "ltl_DFFNP":  # pin order: C, D, Q
+            self.addlogiccell(name+"a","ltl_NAND2"  , [nets[1]   , name+"b"  , name+"a" ])   
+            self.addlogiccell(name+"b","ltl_NAND3"  , [name+"a" , nets[0]    , name+"c", name+"b" ])               
+            self.addlogiccell(name+"c","ltl_NAND2"  , [nets[0]   , name+"d"  , name+"c" ])   
+            self.addlogiccell(name+"d","ltl_NAND2"  , [name+"c" , name+"a"  , name+"d" ])   
+            self.addlogiccell(name+"e","ltl_NAND2"  , [name+"b" , nets[2]    , nets[3]   ])   
+            self.addlogiccell(name+"f","ltl_NAND2"  , [nets[3]   , name+"c"  , nets[2]   ])   
+            # e = Qn, f = Q
         else:
             self.insertcell(name,celltype, nets)
 
-    def insertcell(self,name,celltype, nets):
+    def insertcell(self,name,celltype, nets, geometry='horizontal'):
         for key, val in self.array.items():
             if val.type == celltype and val.pin == nets:
                 print ("Skipping functionally redundant Microcell: {0} {1} ".format(celltype, nets))
@@ -756,7 +885,7 @@ class CellArray():
             if val.type == "EMPTY" and val.y > 0:
 #                print(name,nets)
                 del self.array[key]
-                self.array[name] = Cell(celltype, True, val.x, val.y, nets)
+                self.array[name] = Cell(celltype, True, val.x, val.y, geometry, nets)
                 return
         raise CAParsingError("Failure to insert Cell. Cell array size too small for design! Increase number of cells.")
 
@@ -801,36 +930,37 @@ class CellArray():
             return
         cells = self.nets[netname][1]
 
-        if True:                     # Use half perimeter wirelength algorithm (HPWL)
-            xmin, xmax = self.SizeX, 0                
-            ymin, ymax = self.SizeY, 0                
+        # Use half perimeter wirelength algorithm (HPWL)
+        xmin, xmax = self.SizeX+1, -1               
+        ymin, ymax = self.SizeY+1, -1                
 
-            for currentcell in cells:
-                xmin = xmin if self.array[currentcell].x>xmin else self.array[currentcell].x
-                xmax = xmax if self.array[currentcell].x<xmax else self.array[currentcell].x
-                ymin = ymin if self.array[currentcell].y>ymin else self.array[currentcell].y
-                ymax = ymax if self.array[currentcell].y<ymax else self.array[currentcell].y
+        for currentcell in cells:
+            xpos=self.array[currentcell].x
+            ypos=self.array[currentcell].y
 
-            HPWL = 2*(xmax-xmin)+ymax-ymin # priorize horizontal connections
+            # Optimize for pin positions
+            if self.array[currentcell].geometry == "horizontal":  # cell with horizontal input/output
+                if self.array[currentcell].pin[-1] == netname: 
+                    ypos = ypos + 0.5 # net is on output (right side of cell)
+                else:
+                    ypos = ypos - 0.5 # net is on input (left side of cell)
+            elif self.array[currentcell].geometry == "input":   # cell with input on left side
+                ypos = ypos - 0.5 # net is on input (left side of cell)
+            elif self.array[currentcell].geometry == "center":   # cell with central connection
+                pass
 
-            if netname[-1] == '!':
-                HPWL = HPWL * 3        # priorize internal connections
+            xmin = xmin if xpos>xmin else xpos
+            xmax = xmax if xpos<xmax else xpos
+            ymin = ymin if ypos>ymin else ypos
+            ymax = ymax if ypos<ymax else ypos
 
-            self.nets[netname][0] = HPWL
-        else:                       # old algorithm, manhattan spanning tree
-            lastcell = cells[-1]        
-            segments = []
-            for currentcell in cells:
-                lenx = self.array[currentcell][2] -  self.array[lastcell][2]
-                leny = self.array[currentcell][3] -  self.array[lastcell][3]
-                # len = abs(lenx)  + abs(leny)  # manhattan distance
-                len = abs(lenx) *3 + abs(leny)  # force routing channels
-                lastcell = currentcell
-                segments.append(len)
-            segments.sort()
-            netlength=sum(segments[:-1])  # longest segment is discarded
+        HPWL = 2*(xmax-xmin)+ymax-ymin # priorize horizontal connections
 
-            self.nets[netname][0] = netlength
+        if netname[-1] == '!':     # local connection identified
+            HPWL = HPWL * 3        # priorize internal connections
+
+        self.nets[netname][0] = HPWL
+
 
     # Swap two cells and update the net length selectively
     def swapcells(self, cell1, cell2):
@@ -950,8 +1080,8 @@ def coarseoptimization(startarray, attempts=20, initialtemp=1000, coolingrate=0.
     ordered = sorted(coarseattempts, key=lambda item: item.totallength)
 
     print("Candidate lengths:",end='')
-    for len in ordered:
-        print(" ",len.totallength,end='')
+    for length in ordered:
+        print(" ",length.totallength,end='')
     print("\n")
 
     array_opt = ordered[0]
@@ -985,23 +1115,24 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 8        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 38        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 3        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 12        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
 
                         # Insert monitoring LEDs for I/O pins in list
-# LEDS        = []      # Default, don't insert any LEDs
+LEDS        = []      # Default, don't insert any LEDs
+
 # LEDS        = ["clk","count.0","count.1","count.2"]
-LEDS        = ["clk","dice.0","dice.1","dice.2","dice.3"]
+# LEDS        = ["clk","dice.0","dice.1","dice.2","dice.3"]
 
 Pullups     = []      # Default, don't insert pull up resistors
 # Pullups     = ["dice.0", "dice.1" , "dice.2" , "dice.3"]      
 
 # Optimizer settings. Only change when needed
 
-AreaMargin = 0.2        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
+AreaMargin = 0.3        # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
                         # Too large values will result in waste of area. Default: 0.3
 CoarseAttempts = 20     # Default: 20
 CoarseCycles   = 1000   # Default: 1000
@@ -1009,11 +1140,14 @@ FineCycles     = 10000  # Default: 10000 Increase to improve larger designs.
 
 # Pitch of grid on PCB in mm
 
+PCBPitchx = 2.54*1.5 # LTL
+PCBPitchy = 2.54*2.5 # 
+
 # PCBPitchx = 2.54*2 # default 2*2.54
 # PCBPitchy = 2.54*3 # default 3*2.54
 
-PCBPitchx = 2.54*3 # NE555 logic
-PCBPitchy = 2.54*4 # 
+# PCBPitchx = 2.54*3 # NE555 logic
+# PCBPitchy = 2.54*4 # 
 
 # File names. Don't touch unless you want to modify the flow
 
