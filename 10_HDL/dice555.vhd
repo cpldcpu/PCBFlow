@@ -3,9 +3,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 
---  2     3     
---  4  1  4
---  3     2
+--  1     2     
+--  3  0  3
+--  2     1
 
 -- Encoding:
 -- 001  1
@@ -17,7 +17,7 @@ use ieee.numeric_std.all;
 
 entity dice555 is
 	port (clk:	in	std_logic;
-	      rst:	in	std_logic;
+	      n_clk:	in	std_logic;
 		  dice: out std_logic_vector(3 downto 0)
 
 	);
@@ -26,18 +26,19 @@ end;
 architecture main of dice555 is
     signal  cnt:	unsigned(2 downto 0);
 begin
- 	process (clk,rst)
+ 	process (clk,n_clk)
 	begin
 		if rising_edge(clk) then
-			if (rst = '0') then
-                cnt <= "001";
-            else 
+			-- if (nrst = '0') then
+            --     cnt <= "001";
+            -- else 
                 if cnt < 6 then
                     cnt <= cnt + 1;
                 else
                     cnt <= "001";
                 end if;
-			end if;			
+			-- end if;	
+			-- cnt <= cnt + 1;
 		end if;
 	end process;
 

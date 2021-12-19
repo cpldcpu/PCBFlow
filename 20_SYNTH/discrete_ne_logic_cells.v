@@ -34,6 +34,12 @@ output Y;
 assign Y = ~(A & B & C & D);
 endmodule
 
+module ne_ANDN2(A, B,  Y);
+input A, B;
+output Y;
+assign Y = (A & ~B);
+endmodule
+
 module ne_NOR2(A, B, Y);
 input A, B;
 output Y;
