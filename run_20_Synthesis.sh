@@ -57,9 +57,21 @@ else
     exit 1
 fi
 
+
 cd Work
-ghdl -a --std=02 ../10_HDL/$FILE.vhd 
-yosys ../20_SYNTH/flow_discrete_$APP.ys >208_log_yosys.txt
+ghdl -a --std=02 ../10_HDL/$FILE.vhd         
+
+# yosys_built_with_ghdl=$(yosys -H | grep ghdl)
+
+# if [ "$yosys_built_with_ghdl" == "" ]; then
+if [ "$(yosys -H | grep ghdl)" == "" ]; then
+    echo "Invoking Yosys with external plugin"
+    yosys -m ghdl ../20_SYNTH/flow_discrete_$APP.ys >208_log_yosys.txt
+else
+    echo "Yosys has GHDL integrated"
+    yosys ../20_SYNTH/flow_discrete_$APP.ys >208_log_yosys.txt   
+fi
+
 grep -i 'Printing' -A 28 208_log_yosys.txt
 cd ..
 

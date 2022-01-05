@@ -45,4 +45,4 @@ view: waveforms.ghw
 # use the line above on linux
 
 clean:
-	rm -f *.cf *.ghw *.vcd 
+	rm -f *.cf *.ghw *.vcd testbench
