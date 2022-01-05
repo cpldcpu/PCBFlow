@@ -1115,8 +1115,8 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 3        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 12        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 7        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 60        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
