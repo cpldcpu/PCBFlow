@@ -29,22 +29,18 @@ begin
  	process (clk,n_clk)
 	begin
 		if rising_edge(clk) then
-			-- if (nrst = '0') then
-            --     cnt <= "001";
-            -- else 
-                if cnt < 6 then
-                    cnt <= cnt + 1;
-                else
-                    cnt <= "001";
-                end if;
-			-- end if;	
-			-- cnt <= cnt + 1;
+			if cnt < 6 then
+				cnt <= cnt + 1;
+			else
+				cnt <= "001";
+			end if;
 		end if;
 	end process;
 
-dice(0) <= cnt(0);
-dice(1) <= '0' when (cnt = "001") else '1';
-dice(2) <= cnt(2);
-dice(3) <= '1' when (cnt = "11X") else '0';
- 
+-- drive inverted LEDs
+dice(0) <= NOT cnt(0);
+dice(1) <= '1' when (cnt = "001") else '0';
+dice(2) <= NOT cnt(2);
+dice(3) <= '0' when (cnt = "11X") else '1';
+
 end;
