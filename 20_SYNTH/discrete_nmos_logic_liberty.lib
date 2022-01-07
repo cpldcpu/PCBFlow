@@ -97,6 +97,68 @@ cell(nm_NOR2) {
              function: "(A+B+C)'"; }
   }
 
+    cell(nm_DFFNP) {
+    area: 13;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+   }
+
+    cell(nm_DFFNP_CLR) {
+    area: 15;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; 
+                  clear:      "CD'";}
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(CD) { direction: input; }    
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+   }
+/*
+   cell(hy_XOR2) {
+    area: 3;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A^B)"; }
+  }
+*/
+  
+/*
+  cell(lvc_DFF) {
+    area: 1;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+    cell(lvc_DFF_clear) {
+    area: 1;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; 
+                  clear:      "CD'";}
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(CD) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+*/
+  /*
   cell(nm_DFF) {
     area: 15;
     ff(IQ, IQN) { clocked_on: C;
@@ -107,4 +169,5 @@ cell(nm_NOR2) {
     pin(Q) { direction: output;
               function: "IQ"; }
   }
+  */
 }

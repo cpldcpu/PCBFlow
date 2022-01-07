@@ -73,3 +73,32 @@ output reg Q;
 always @(posedge C)
 	Q <= D;
 endmodule
+
+
+module nm_DFFNP(C, D, Q, QN);
+input C, D;
+output reg Q;
+output QN;
+always @(posedge C)
+    Q <=  D;
+
+assign QN = ~Q;
+
+endmodule
+
+module nm_DFFNP_CLR(C, CD, D, Q, QN);
+input C, D, CD;
+output reg Q;
+output QN;
+always @(posedge C or negedge CD)
+begin
+    if (CD == 1'b0)
+        Q <= 1'b0; 
+    else
+        Q <=  D;
+end
+
+assign QN = ~Q;
+
+endmodule
+
