@@ -49,7 +49,7 @@ elif [ "$APP" == "hybrid" ]; then
 elif [ "$APP" == "YG" ]; then
     echo "Synthesizing to YG strip logic"
 elif [ "$APP" == "LTL" ]; then
-    echo "Synthesizing to LED-Transistor-Logic"
+    echo "Synthesizing to LED²-Transistor-Logic"
 elif [ "$APP" == "NE" ]; then
     echo "Synthesizing to NE555 logic"
 else
@@ -61,11 +61,8 @@ fi
 cd Work
 ghdl -a --std=02 ../10_HDL/$FILE.vhd         
 
-# yosys_built_with_ghdl=$(yosys -H | grep ghdl)
-
-# if [ "$yosys_built_with_ghdl" == "" ]; then
 if [ "$(yosys -H | grep ghdl)" == "" ]; then
-    echo "Invoking Yosys with external plugin"
+    echo "Invoking Yosys with external GHDL plugin"
     yosys -m ghdl ../20_SYNTH/flow_discrete_$APP.ys >208_log_yosys.txt
 else
     echo "Yosys has GHDL integrated"
@@ -75,4 +72,4 @@ fi
 grep -i 'Printing' -A 28 208_log_yosys.txt
 cd ..
 
-# ngspice testbench_rtl.sp 
+
