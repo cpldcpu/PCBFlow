@@ -77,3 +77,19 @@ always @(posedge C)
 assign QN = ~Q;
 
 endmodule
+
+module ltl_DFFNP_CLR(C, CD, D, Q, QN);
+input C, D, CD;
+output reg Q;
+output QN;
+always @(posedge C or negedge CD)
+begin
+    if (CD == 1'b0)
+        Q <= 1'b0; 
+    else
+        Q <=  D;
+end
+
+assign QN = ~Q;
+
+endmodule

@@ -89,7 +89,8 @@ cell(ltl_AOI2_2_2) {
     pin(Y) { direction: output;
              function: "((A*B)+(C*D)+(E*F))'"; }
   }
-
+  */
+/*
 cell(ltl_NOR2) {
     area: 4;
     pin(A) { direction: input; }
@@ -142,7 +143,45 @@ cell(ltl_NOR2) {
     pin(QN) { direction: output;
               function: "IQN"; }
    }
+  
+    cell(ltl_DFFNP_CLR) {
+    area: 12;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; 
+                  clear:      "CD'";}
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(CD) { direction: input; }    
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+   }
+  
+/*
+  cell(lvc_DFF) {
+    area: 1;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
   }
-
-
+    cell(lvc_DFF_clear) {
+    area: 1;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; 
+                  clear:      "CD'";}
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(CD) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+  */
+  
 }
