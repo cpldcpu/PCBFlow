@@ -29,7 +29,8 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
               function: "A'"; }
   }
-
+/*
+// Does not work in circuit for some reason
  cell(ne_ANDN2) {
     area: 1;
     pin(A) { direction: input; }
@@ -37,7 +38,7 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
              function: "(A*B')"; }
   }
-/*
+*/
   cell(ne_NAND2) {
     area: 2;
     pin(A) { direction: input; }
@@ -64,7 +65,7 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
              function: "(A*B*C*D)'"; }
   }
-*/
+
 
 /*
 // Not implemented
@@ -127,6 +128,19 @@ cell(nm_AOI1_2) {
     pin(C) { direction: input;
                  clock: true; }
     pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+
+   cell(ne_DFF_clear) {
+    area: 5;
+    ff(IQ, IQN) { clocked_on: C;
+                  next_state: D; 
+                  clear:      "CD'";}
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(CD) { direction: input; }
     pin(Q) { direction: output;
               function: "IQ"; }
   }

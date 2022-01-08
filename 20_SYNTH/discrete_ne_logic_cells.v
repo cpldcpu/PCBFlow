@@ -58,3 +58,18 @@ output reg Q;
 always @(posedge C)
 	Q <= D;
 endmodule
+
+module ne_DFF_clear(C, CD, D, Q);
+input C, D, CD;
+output reg Q;
+always @(posedge C or negedge CD)
+    begin
+        if (CD == 1'b0)
+            Q <= 1'b0; 
+        else
+            Q <=  D;
+    end
+endmodule
+
+
+
