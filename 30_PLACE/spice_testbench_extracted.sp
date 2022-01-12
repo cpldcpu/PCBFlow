@@ -21,20 +21,25 @@ Vcc Vcc 0 DC 5
 
 * input signals
 
-Vclk clk 0 PULSE(0 5 10u 20n 20n 8u 20u)
-Vrst rst 0 PULSE(0 5 5u 20n 20n 29u 400u)
+* Vrst rst 0 DC 0
+Vrst nrst 0 dc 0 PULSE(5 0 500n 5n 5n 6u 180u)
+Vclk clk 0 dc 0 PULSE(0 5 4u 5n 5n 4u 8u)
 
 * Note: No pull up needed on outputs since they are internally connected. B
 * Pull ups may have to be added for other designs
 
-Xuut clk rst out0 out1 out2 main
+Xuut clk nrst out0 out1 out2 main
 
-.tran 20n 400u
+.tran 500p 100u
+* .measure tran maxv MAX out0
+* .measure tran out0tr TRIG out0 VAL=0.2*maxv RISE=1 TARG out0 VAL=0.8*maxv RISE=1
 
 .control
 run
-plot v(clk)+5 v(rst) v(out0)+10 v(out1)+15 v(out2)+20 
-plot i(vcc)
+plot v(clk)+5 v(nrst) v(out0)+10 v(out1)+15 v(out2)+20 
 .endc
+
+.end
+
 
 .end
