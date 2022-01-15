@@ -30,14 +30,14 @@ library(SingleLogicCells) {
         three_state : "E"; }
   }
 
-  cell(NOT) {
+  cell(rtpg_NOT) {
     area: 1;
     pin(A) { direction: input; }
     pin(Y) { direction: output;
               function: "A'"; }
   }
 
-  cell(NOR2) {
+  cell(rtpg_NOR2) {
     area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -45,7 +45,7 @@ library(SingleLogicCells) {
              function: "(A+B)'"; }
   }
 
-  cell(NOR3) {
+  cell(rtpg_NOR3) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -54,7 +54,7 @@ library(SingleLogicCells) {
              function: "(A+B+C)'"; }
   }
 
-  cell(XOR2) {
+  cell(rtpg_XOR2) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -62,7 +62,7 @@ library(SingleLogicCells) {
              function: "(A^B)"; }
   }
 
-  cell(DFF7T) {
+  cell(rtpg_DFF7T) {
     area: 7;
     ff(IQ, IQN) { clocked_on: C;
                   next_state: D; }
@@ -72,17 +72,4 @@ library(SingleLogicCells) {
     pin(Q) { direction: output;
               function: "IQ"; }
   }
-
-  cell(DFF) {
-    area: 15;
-    ff(IQ, IQN) { clocked_on: C;
-                  next_state: D; }
-    pin(C) { direction: input;
-                 clock: true; }
-    pin(D) { direction: input; }
-    pin(Q) { direction: output;
-              function: "IQ"; }
-  }
-
-
 }

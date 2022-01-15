@@ -3,4 +3,5 @@ Work/**
 *.ghw
 *.o
 *.lst
+*.txt
 10_HDL/testbench

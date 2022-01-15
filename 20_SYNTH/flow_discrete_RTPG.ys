@@ -11,7 +11,7 @@ flatten
 rename -top main
 
 # Read verilog description of cells
-read_verilog -lib ../20_SYNTH/discrete_RT_logic_cells.v
+read_verilog -lib ../20_SYNTH/discrete_RTPG_logic_cells.v
 
 # Draw netlist of elaborated design
 show -format pdf -prefix 200_diagramm_hdl_elaborated

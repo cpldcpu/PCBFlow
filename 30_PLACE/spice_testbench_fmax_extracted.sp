@@ -16,8 +16,9 @@ Vcc Vcc 0 DC 5
 .include 308_extracted_netlist.sp
 
 * Define base and load resistor
-.param RL=3.3k
-.param RB=3.3k
+.param RL=4.7k
+.param RB=4.7k
+.param CB=22p
 
 * input signals
 
@@ -46,7 +47,7 @@ let freqstep    = freq/2
 let step = 1
 let maxf = 0
 
-echo "Step, Period [µS], f_clk [MHz], ratio_0 , ratio_1 , ratio_2 , MaxFreq [MHz], MaxV [V], AvgI [mA]" >> out.txt
+echo "Step, Period [µS], f_clk [MHz], ratio_0 , ratio_1 , ratio_2 , MaxFreq [MHz], MaxV [V], AvgI [mA]" >> "330_fmax_simulation.txt"
     * dowhile freqclk/freq0 > 1.8
     dowhile step < 10
         alter Vcc = ixx
@@ -89,7 +90,7 @@ echo "Step, Period [µS], f_clk [MHz], ratio_0 , ratio_1 , ratio_2 , MaxFreq [MH
 
         let freqstep = freqstep / 2
 
-        echo "$&step, $&period, $&freqclk, $&ratio0, $&ratio1, $&ratio1, $&maxf,  $&maxv, $&avgi" >> out.txt
+        echo "$&step, $&period, $&freqclk, $&ratio0, $&ratio1, $&ratio1, $&maxf,  $&maxv, $&avgi" >> "330_fmax_simulation.txt"
 
         let step = step + 1
 

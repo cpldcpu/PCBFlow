@@ -18,6 +18,7 @@ Vcc Vcc 0 DC 5
 * Define base and load resistor
 .param RL=3.3k
 .param RB=3.3k
+.param CB=68p
 
 * input signals
 
@@ -29,6 +30,7 @@ Vclk clk 0 dc 0 PULSE(0 5 4u 5n 5n 4u 8u)
 * Pull ups may have to be added for other designs
 
 Xuut clk nrst out0 out1 out2 main
+* Xuut clk nrst out0 out1 out2 out3 main
 
 .tran 500p 100u
 * .measure tran maxv MAX out0
@@ -36,7 +38,8 @@ Xuut clk nrst out0 out1 out2 main
 
 .control
 run
-plot v(clk)+5 v(nrst) v(out0)+10 v(out1)+15 v(out2)+20 
+plot v(clk)+5 v(nrst) v(out0)+10 v(out1)+15 v(out2)+20
+* plot v(clk)+5 v(nrst) v(out0)+10 v(out1)+15 v(out2)+20 v(out3)+25
 .endc
 
 .end

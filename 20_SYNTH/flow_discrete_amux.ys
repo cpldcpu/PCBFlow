@@ -18,8 +18,7 @@ rename -top main
 show -format pdf -prefix 200_diagramm_hdl_elaborated
 
 # simulation
-sim -vcd 207_simulation.vcd -clock clk -rstlen 10 -reset rst -n 100 main
-
+sim -vcd 207_simulation.vcd -clock clk -rstlen 10 -resetn nrst -n 100 main
 
 # Insert tristate buffers (ATTENTION: Currently not a supported cell type during P&R)
 tribuf
