@@ -21,14 +21,14 @@ library(SingleLogicCells) {
               function: "A"; }
   }
   
-  cell(NOT) {
+  cell(rt_NOT) {
     area: 1;
     pin(A) { direction: input; }
     pin(Y) { direction: output;
               function: "A'"; }
   }
 
-  cell(NOR2) {
+  cell(rt_NOR2) {
     area: 2;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -36,7 +36,7 @@ library(SingleLogicCells) {
              function: "(A+B)'"; }
   }
 
-  cell(NOR3) {
+  cell(rt_NOR3) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -45,7 +45,7 @@ library(SingleLogicCells) {
              function: "(A+B+C)'"; }
   }
 /*
-  cell(XOR2) {
+  cell(rt_XOR2) {
     area: 3;
     pin(A) { direction: input; }
     pin(B) { direction: input; }
@@ -53,7 +53,7 @@ library(SingleLogicCells) {
              function: "(A^B)"; }
   }
 
-  cell(DFF7T) {
+  cell(rt_DFF7T) {
     area: 7;
     ff(IQ, IQN) { clocked_on: C;
                   next_state: D; }
@@ -64,8 +64,10 @@ library(SingleLogicCells) {
               function: "IQ"; }
   }
 */
-  cell(DFF) {
-    area: 15;
+/*
+// PH-Master Slave FF
+  cell(rt_DFF) {
+    area: 16;
     ff(IQ, IQN) { clocked_on: C;
                   next_state: D; }
     pin(C) { direction: input;
@@ -74,6 +76,58 @@ library(SingleLogicCells) {
     pin(Q) { direction: output;
               function: "IQ"; }
   }
+*/
 
+// Falling edge clock: C'
+
+    cell(rt_DFF6NOR_NP) {
+    area: 13;
+    ff(IQ, IQN) { clocked_on: "C'";
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input;
+             nextstate_type: data;  }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+   }
+
+// Clocked on falling edge, SYNC CLR is high active
+    cell(rt_DFF6NOR_NPCLR) {
+    area: 15;
+    ff(IQ, IQN) { clocked_on: "C'";
+                  next_state: "D";
+                  clear: "CLR"; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(CLR) { direction: input; }    
+    pin(D) { direction: input;
+             nextstate_type: data;  }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+   }
+
+
+
+// Clocked on falling edge, SYNC SET is high active
+    cell(rt_DFF6NOR_NPSET) {
+    area: 14;
+    ff(IQ, IQN) { clocked_on: "C'";
+                  preset: "SET";
+                  next_state: "D"; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(SET) { direction: input; }    
+    pin(D) { direction: input;
+             nextstate_type: data;  }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+   }
 
 }

@@ -22,8 +22,14 @@ tribuf
 # Technology mapping
 techmap
 
+# Work around to map DFF with sync set/reset, since this is not possible in liberty file
+# proc; opt;
+# dfflegalize -cell $_SDFF_NP0_ x 
+# techmap -map ../20_SYNTH/discrete_RT_techmap.v   # map TBUF
+
 proc; opt; fsm; opt; 
 dfflibmap -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib
+proc; opt; 
 abc -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib
 opt_clean -purge
 
@@ -35,7 +41,7 @@ show -format pdf -prefix 208_diagramm_after_mapping
 
 
 # Write out in spice format
-write_spice -inames 209_synthesized_output.sp
+write_spice 209_synthesized_output.sp
 write_json  210_synthesized_output.json
 
 
