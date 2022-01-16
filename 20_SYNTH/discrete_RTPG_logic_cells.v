@@ -34,11 +34,28 @@ output Y;
 assign Y = ~(A | B | C);
 endmodule
 
-module rtpg_DFF7T(C, D, Q);
-input C, D;
+module rtpg_NOR4(A, B, C, D, Y);
+input A, B , C, D;
+output Y;
+assign Y = ~(A | B | C | D);
+endmodule
+
+module rtpg_DFF7T(nC, D, Q);
+input nC, D;
 output reg Q;
-always @(posedge C)
+always @(negedge nC)
 	Q <= D;
+endmodule
+
+module rtpg_DFF7T_PN(nC, D, Q, QN);
+input nC, D;
+output reg Q;
+output QN;
+
+always @(negedge cC)
+	Q <= D;
+assign QN = ~Q;
+
 endmodule
 
 module rtpg_DFF7T_CLR(C, CD, D, Q, QN);

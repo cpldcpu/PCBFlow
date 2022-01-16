@@ -54,6 +54,17 @@ library(SingleLogicCells) {
              function: "(A+B+C)'"; }
   }
 
+  cell(rtpg_NOR4) {
+      area: 4;
+      pin(A) { direction: input; }
+      pin(B) { direction: input; }
+      pin(C) { direction: input; }
+      pin(D) { direction: input; }
+      pin(Y) { direction: output;
+               function: "(A+B+C+D)'"; }
+    }
+  
+
   cell(rtpg_XOR2) {
     area: 3;
     pin(A) { direction: input; }
@@ -61,15 +72,30 @@ library(SingleLogicCells) {
     pin(Y) { direction: output;
              function: "(A^B)"; }
   }
-
+/*
   cell(rtpg_DFF7T) {
     area: 7;
-    ff(IQ, IQN) { clocked_on: C;
+    ff(IQ, IQN) { clocked_on: "nC'";
                   next_state: D; }
-    pin(C) { direction: input;
+    pin(nC) { direction: input;
                  clock: true; }
     pin(D) { direction: input; }
     pin(Q) { direction: output;
               function: "IQ"; }
   }
+*/  
+
+  cell(rtpg_DFF7T_PN) {
+    area: 7;
+    ff(IQ, IQN) { clocked_on: "nC'";
+                  next_state: D; }
+    pin(nC) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(QN) { direction: output;
+              function: "IQN"; }
+  }
+
 }

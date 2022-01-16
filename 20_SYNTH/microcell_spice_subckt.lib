@@ -2,6 +2,8 @@
 * 2021-Nov-20  cpldcpu
 
 * Extracted circuit microcell
+
+*nmos
 .SUBCKT NM G D S
 X1 D G S 2N7002   
 R1 VCC G {RL}
@@ -13,6 +15,7 @@ R1 VCC A {RL}
 R2 A G   {RL}
 .ENDS NM
 
+* RT
 .SUBCKT rt_NOT A Y
 Q1 Y N001 VEE 0 RTL_NPN
 R1 VCC A {RL}
@@ -20,32 +23,52 @@ R2 N001 A {RB}
 C1 A N001 {CB}
 .ENDS NOT
 
-.SUBCKT rt_NOTb A base Y
+* RTPG
+*rtpg_NOT      
+*rtpg_NOToc    
+*rtpg_TBUFc    
+*rtpg_NOTb     
+*rtpg_TBUFe    
+
+.SUBCKT rtpg_NOT A Y
+Q1 Y N001 VEE 0 RTL_NPN
+R1 VCC Y {RL}
+R2 N001 A {RB}
+.ENDS rtpg_NOT
+
+.SUBCKT rtpg_NOToc A Y
+Q1 Y N001 VEE 0 RTL_NPN
+R2 N001 A {RB}
+.ENDS rtpg_NOToc
+
+.SUBCKT rtpg_NOTb A base Y
 Q1 Y base VEE 0 RTL_NPN
-R1 VCC A {RL}
+R1 VCC Y {RL}
 R2 base A {RB}
-.ENDS NOT
+.ENDS rtpg_NOTb
 
 * npn pass transistor with collector at input
-.SUBCKT TBUFc E A Y
+.SUBCKT rtpg_TBUFc E A Y
 Q1 A N001 Y 0 RTL_NPN
 R1 E N001 {RB}
-R2 VCC A {RL}
-R3 VCC E {RL}
-.ENDS NOT
+R2 VCC E {RB}
+.ENDS rtpg_TBUFc
 
 * npn pass transistor with emitter at input
-.SUBCKT TBUFe E A Y
+.SUBCKT rtpg_TBUFe E A Y
 Q1 Y N001 A 0 RTL_NPN
 R1 E N001 {RB}
-R2 VCC A {RL}
-R3 VCC E {RL}
-.ENDS NOT
+R2 VCC Y {RB}
+.ENDS rtpg_TBUFe
+
+* amux 
 
 * for post layout simulation
 .SUBCKT AMUX B1 B2 S A
 X1 B2 GND B1 A VCC S 74LVC1G3157
 .ENDS
+
+* LED and IO cells
 
 .SUBCKT LED A
 Q1 N002 N001 VEE 0 RTL_NPN
@@ -57,6 +80,7 @@ R2 N001 A {RB}
 R1 VCC A {RL}
 .ENDS IOP
 
+* NE logic
 .SUBCKT ne_NOT A Y   
 XU1 A N001 A VCC Y NC_01 VCC 0 TLC55X
 C1 VCC 0 100n

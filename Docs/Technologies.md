@@ -15,15 +15,15 @@
 - Minimum Cell size: 0.15" x 0.25"
 - Recommended components: PMBT2369, RL=3.3k, RB=3.3k, Cp=22p for 5V. 
   
-Post layout simulation count.vhd:
+### Post Layout Simulation of counter.vhd
 1) PMBT2369/3.3k/3.3k/68p/ DFF6xNOR @ 5V 
-   - 58 logic cells
+   - 58 micro-cells
    - Functional: Pass
    - Fmax: 25.5 MHZ @ 70.2 mA  (for RL=RB=4.7 Fmax is 19.3 MHz@49mA. with MMBT3904: 5.5 MHz)
    - clock-to-out0 delay rise: 14.3 ns fall: 14.8 ns
 
 2) PMBT2369/3.3k/3.3k/22p/ M-S PH-Latch @ 5V
-   - 69 logic cells
+   - 69 micro-cells
    - Functional: Pass
    - Fmax: 6.4 MHZ @ 79 mA
    - clock-to-out0 delay rise: 11.5 ns fall: 26.7 ns
@@ -35,22 +35,41 @@ Post layout simulation count.vhd:
 
 ---
 
-# RTPG    Bipolar Resistor Transistor Logic with pass gates
+# RTPG  -  Bipolar Resistor Transistor Logic with pass gates
 
 - Low speed logic optimized for low component count.
-- Uses NOR style logic with additional "artistic" gates based on pass-gate NPN transistors. No voltage balancing, instead strong high level to allow fan out.
+- Uses NOR style logic with additional "artistic" gates based on pass-gate NPN transistors.
+- No voltage balancing, instead strong high level to allow fan out.
 - Achieves 300-500kHz with MMBT3904 clones (e.g. CJ)
 - Supported gates: NOT, NOR2, NOR3, NOR4, XOR2
 - Flip-Flop: 3T master slave FF with pass gate
 - Minimum cell size: 0.15" x 0.25"
-- Recommended Components: MMBT3904, Rl=2.2k, Rb=10k for 5V (FOmax=4). Attention: PMBT2369 will not work in this logic style due to too low reverse beta
-  
-### TODO
-- Implement cells with RL on output
-- Clock distribution
-- DFF_NP with clear
-- Adopt to 0.15" y-pitch
+- Recommended Components: MMBT3904, Rl=3.3k, Rb=10k for 5V (FOmax=4). 
 
+- **Attention**: PMBT2369 will not work in this logic style due to too low reverse beta
+  
+### Post Layout Simulation of counter.vhd
+1) MMBT3904/3.3k/10k/DFF7T/XOR @5V
+   - 40 micro-cells
+   - Functional: Pass
+   - Fmax: 0.625 MHZ @ 30.2 mA  
+   - clock-to-out0 delay rise: 589 ns fall: 370 ns
+
+2) MMBT3904/3.3k/10k/DFF7T_PN/XOR @5V
+   - 37 micro-cells
+   - Functional: Pass
+   - Fmax: 0.625 MHZ @ 27.2 mA  
+   - clock-to-out0 delay rise: 550 ns fall: 371 ns
+
+
+### TODO
+- Implement TBUFc / TBUFe changes also in layout -> done
+- Implement cells with RL on output -> done
+- Clock distribution
+- DFF_NP with clear -> done
+- Adopt to 0.15" y-pitch -> done
+
+---
 # nmos - NMOS transistor logic
 
 - NMOS logic based on power mosfet supporting wide number of gate types.
@@ -69,6 +88,7 @@ Post layout simulation count.vhd:
 -   Clock distribution
 -   Double check DFF implementation
 
+---
 # LTL - LED Transistor Logic
 
 - The bestest and fastest. Diode Transistor logic that emits light while being active.
@@ -85,6 +105,7 @@ Post layout simulation count.vhd:
 - Implement clear in DFF
 - Merge both into one. 
 
+---
 # Deprecated
 
 ## 74LVC - 74LVC single gate logic
