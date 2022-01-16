@@ -16,7 +16,6 @@ if [ "$1" == "" ]; then
     echo "  RT      Bipolar Resistor Transistor Logic (default)"
     echo "  RTPG    Bipolar Resistor Transistor Logic with pass gates"
     echo "  nmos    nmos transistor logic"
-    echo "  hybrid  hybrid nmos/bipolar logic"
     echo "  amux    analog multiplexer logic"
     echo "  74LVC   74LVC single gate logic"
     echo "  YG      YG strip logic"
@@ -44,8 +43,6 @@ elif [ "$APP" == "amux" ]; then
     echo "Synthesizing to analog multiplexer logic"
 elif [ "$APP" == "74LVC" ]; then
     echo "Synthesizing to single gate TTL logic (74LVC)"
-elif [ "$APP" == "hybrid" ]; then
-    echo "Synthesizing to hybrid Bipolar/nmos logic"
 elif [ "$APP" == "YG" ]; then
     echo "Synthesizing to YG strip logic"
 elif [ "$APP" == "LTL" ]; then

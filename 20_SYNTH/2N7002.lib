@@ -1,5 +1,5 @@
 *---------- 2N7002 Spice Model ----------
-.SUBCKT 2N7002 10 20 30 
+.SUBCKT NMOS_MOSFET 10 20 30 
 *     TERMINALS:  D  G  S
 M1 1 2 3 3 NMOS L = 1E-006 W = 1E-006 
 RD 10 1 0.976 
