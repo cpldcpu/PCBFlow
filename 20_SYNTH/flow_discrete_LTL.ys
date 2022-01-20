@@ -23,6 +23,7 @@ techmap
 
 proc; opt; fsm; opt; 
 dfflibmap -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
+proc; opt;
 abc -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
 opt_clean -purge
 

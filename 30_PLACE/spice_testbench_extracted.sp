@@ -9,14 +9,18 @@ Vcc Vcc 0 DC 5
 * load design and library
 .include ../20_SYNTH/microcell_spice_subckt.lib
 .include ../20_SYNTH/2N7002.lib
-* .include ../20_SYNTH/PMBT2369.lib
-.include ../20_SYNTH/PMBT3904.lib
+.include ../20_SYNTH/PMBT2369.lib
+* .include ../20_SYNTH/PMBT3904.lib
 .include ../20_SYNTH/LTL_LED.lib
 .include ../20_SYNTH/amux.lib
 .include 308_extracted_netlist.sp
 
 * Define base and load resistor
-.param RL=3.3k
+* .param RL=3.3k
+* .param RB=3.3k
+*.param CB=68p
+
+.param RL=1.5k
 .param RB=3.3k
 .param CB=68p
 
@@ -24,7 +28,8 @@ Vcc Vcc 0 DC 5
 
 * Vrst rst 0 DC 0
 Vrst nrst 0 dc 0 PULSE(5 0 500n 5n 5n 6u 180u)
-Vclk clk 0 dc 0 PULSE(0 5 4u 5n 5n 4u 8u)
+* Vclk clk 0 dc 0 PULSE(5 2 1u 5n 5n 4u 8u)
+Vclk clk 0 dc 0 PULSE(0 5 4u 150n 150n 4u 8u)
 
 * Note: No pull up needed on outputs since they are internally connected. B
 * Pull ups may have to be added for other designs

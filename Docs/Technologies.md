@@ -30,14 +30,14 @@
 
 
 ### TODO
--   Clock distribution -> new dff has clock buffer. Manage fan ?
+-   Clock distribution -> new dff has clock buffer. Manage fanout ?
 -   Change to 6xNOR DFF with sync reset? -> done, significant improvement in area and speed.
 
 ---
 
 # RTPG  -  Bipolar Resistor Transistor Logic with pass gates
 
-- Low speed logic optimized for low component count.
+- Low speed logic optimized for low component count. **Attention:** USe with care: High Fan out may create nonfunctional circuit. 
 - Uses NOR style logic with additional "artistic" gates based on pass-gate NPN transistors.
 - No voltage balancing, instead strong high level to allow fan out. 
 - Achieves 300-500kHz with MMBT3904 clones (e.g. CJ)
@@ -80,7 +80,7 @@
   - low cost: 2N7002, Rl=1k, 
   - High speed: FDV301/DMG301, Rl=1K
 - Is very noisy on supply. Some improvement of speed/power trade-off could be achieved by balancing the load resistor for fanout.
-
+### Post Layout Simulation of counter.vhd
 1) MMBT7002/1k/DFF7T @5V
    - 58 micro-cells (58 transistor, 27 resistor)
    - Functional: Pass
@@ -108,7 +108,12 @@
 - Minimum cell size: 0.15" x 0.25"
 - Recommended Components: 
 
-
+### Post Layout Simulation of counter.vhd
+1) PMBT2369/1.8k/3.3k @5V
+   - 58 micro-cells (58 transistor, 27 resistor)
+   - Functional: Pass
+   - Fmax: 1.17 MHZ @ 66.6 mA  (RL=2.2k: Fmax=0.55 MHz@30 mA)
+   - clock-to-out0 delay rise: 77.8 ns fall: 183 ns
 # amux - analog multiplexer logic
 
 ### TODO
@@ -129,6 +134,7 @@
 ## NE  -    NE555 logic
 
 - Don't use, this is more of a joke. It works, but is slow, large, expensive and power hungry.
+- Removed to declutter source
 
 ## hybrid - hybrid nmos/bipolar logic
 

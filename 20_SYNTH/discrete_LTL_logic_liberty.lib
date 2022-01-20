@@ -108,15 +108,6 @@ cell(ltl_NOR2) {
              function: "(A+B+C)'"; }
   }
 */
-/*
-  cell(ltl_XOR2) {
-    area: 3;
-    pin(A) { direction: input; }
-    pin(B) { direction: input; }
-    pin(Y) { direction: output;
-             function: "(A^B)"; }
-  }
-*/
 
 /*
   cell(ltl_DFF) {

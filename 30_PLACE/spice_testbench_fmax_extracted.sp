@@ -8,7 +8,8 @@ Vcc Vcc 0 DC 5
 
 * load design and library
 .include ../20_SYNTH/microcell_spice_subckt.lib
-.include ../20_SYNTH/2N7002.lib
+* .include ../20_SYNTH/2N7002.lib
+.include ../20_SYNTH/DMG301.lib
 * .include ../20_SYNTH/PMBT2369.lib
 .include ../20_SYNTH/PMBT3904.lib
 .include ../20_SYNTH/LTL_LED.lib
@@ -16,9 +17,14 @@ Vcc Vcc 0 DC 5
 .include 308_extracted_netlist.sp
 
 * Define base and load resistor
-.param RL=4.7k
-.param RB=4.7k
+*.param RL=4.7k
+*.param RB=4.7k
+*.param CB=22p
+
+.param RL=2.2k
+.param RB=10k
 .param CB=22p
+
 
 * input signals
 

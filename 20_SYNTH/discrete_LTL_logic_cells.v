@@ -60,12 +60,6 @@ always @(posedge C)
 	Q <= D;
 endmodule
 */
-module hy_XOR2(A, B, Y);
-input A, B;
-output Y;
-assign Y = (A ^ B);
-endmodule
-
 
 module ltl_DFFNP(C, D, Q, QN);
 input C, D;
