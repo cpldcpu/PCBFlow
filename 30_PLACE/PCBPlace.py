@@ -279,49 +279,26 @@ class PCBPlacer():
 
         self.devcounter += 1
 
-    def insertNMOSinv(self,x, y, netin, netdrain, netsource, cellname="void"):
+    def insertNMOSinv(self,x, y, netin, netdrain, netsource, cellname="void", loadresistor=True):
         """Insert NMOS inverter with base tap at position x,y
         Assumes standard library with transistor and resistor
         supply nets are VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="2N7002", x=str(x+1.65), y=str(y+1.4+0.3))
-        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4+0.3))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="2N7002", x=str(x+1.65), y=str(y+1.25))
         self.countcomponent("nmos transistor")
-        self.countcomponent("resistor")
 
         self.addcontact(netsource , "Q" +cellname, "2" )
-        self.addcontact('VCC'     , "Rl"+cellname, "2" )
-     
-        self.addcontact(netin     , "Rl"+cellname, "1" )
         self.addcontact(netin     , "Q" +cellname, "1")
+        self.addcontact(netdrain  , "Q" +cellname, "3")
 
-        self.addcontact(netdrain , "Q"  +cellname, "3")
+        if loadresistor:
+            et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RESL", x=str(x+2.95), y=str(y+2.63),rot="R90" )
+            self.countcomponent("resistor")
+            self.addcontact('VCC'    , "Rl"+cellname, "2" )
+            self.addcontact(netdrain , "Rl"+cellname, "1" )
 
         self.devcounter += 1
-
-    def insertNMOSinvg(self,x, y, netin, netgate, netdrain, cellname="void"):
-        """Insert nmos inverter with Gate tap at position x,y
-        Assumes standard library with transistor and resistor
-        supply nets are VCC and GND."""
-
-        n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="2N7002", x=str(x+1.65), y=str(y+1.4+0.3))
-        et.SubElement(n_elements, 'element', name = "Rb"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4+0.3))
-        et.SubElement(n_elements, 'element', name = "Rl"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+4.3+0.3))
-        self.countcomponent("nmos transistor")
-        self.countcomponent("resistor",2)
-
-        self.addcontact('GND'   , "Q"+cellname , "2" )
-        self.addcontact('VCC'   , "Rl"+cellname, "2" )
-     
-        self.addcontact(netin   , "Rl"+cellname, "1" )
-        self.addcontact(netin   , "Rb"+cellname, "1" )
-
-        self.addcontact(netdrain, "Q"+cellname , "3")
-
-        self.addcontact(netgate , "Q"+cellname , "1")
-        self.addcontact(netgate , "Rb"+cellname, "2")
 
     def insertAMUX(self,x, y, netB1, netB2, netS, netout, cellname="", cap=True):
         """Insert analog multiplexer 74LVC1G3157
@@ -386,98 +363,6 @@ class PCBPlacer():
         self.addcontact(netoutq , "Q"+cellname, "4" )
         self.addcontact('VCC'   , "Q"+cellname, "5" )
         self.addcontact(netclrn , "Q"+cellname, "6" )
-
-    def insertNE555not(self, x, y, netin, netout, cellname=""):
-        """Insert NE555 logic inverter """
-
-        n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOIC-8", value="NE555", x=str(x+1.6), y=str(y+3.7),rot="R90")
-        self.countcomponent("NE555")
-
-        self.addcontact('GND'   , "Q"+cellname, "1" ) # GND
-        self.addcontact(netin   , "Q"+cellname, "2" ) # TRIG
-        self.addcontact(netout  , "Q"+cellname, "3" ) # OUT
-        self.addcontact('VCC'   , "Q"+cellname, "4" ) # RESET
-        # self.addcontact(''     , "Q"+cellname, "5" ) # CONT
-        self.addcontact(netin   , "Q"+cellname, "6" ) # THRESH
-        # self.addcontact(''     , "Q"+cellname, "7" ) # DISCH
-        self.addcontact('VCC'   , "Q"+cellname, "8" ) # VCC
-
-        # always insert cap
-        et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x-1.8), y=str(y+3.7),rot="R90")
-        self.countcomponent("cap")
-        self.addcontact('VCC'  , "C"+cellname, "2" )
-        self.addcontact('GND'  , "C"+cellname, "1" )        
-
-    def insertNE555andn2(self, x, y, netina, netinb, netout, cellname=""):
-        """Insert NE555 logic inverter """
-
-        n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOIC-8", value="NE555", x=str(x+1.6), y=str(y+3.7),rot="R90")
-        self.countcomponent("NE555")
-
-        self.addcontact('GND'   , "Q"+cellname, "1" ) # GND
-        self.addcontact(netinb  , "Q"+cellname, "2" ) # TRIG
-        self.addcontact(netout  , "Q"+cellname, "3" ) # OUT
-        self.addcontact(netinb  , "Q"+cellname, "4" ) # RESET
-        #  self.addcontact(''     , "Q"+cellname, "5" ) # CONT
-        self.addcontact(netinb  , "Q"+cellname, "6" ) # THRESH
-        #  self.addcontact(''     , "Q"+cellname, "7" ) # DISCH
-        self.addcontact('VCC'   , "Q"+cellname, "8" ) # VCC
-
-        # always insert cap
-        et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x-1.8), y=str(y+3.7),rot="R90")
-        self.countcomponent("cap")
-        self.addcontact('VCC'  , "C"+cellname, "2" )
-        self.addcontact('GND'  , "C"+cellname, "1" )        
-
-    def insertNE555wand(self, x, y, netins, netout, cellname=""):
-        """Insert wired and for NE555 logic """
-
-        n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "R"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+3.25), y=str(y+6.1),rot="R90" )
-        self.countcomponent("resistor")
-        self.addcontact(netout , "R"+cellname, "1" )
-        self.addcontact('VCC'  , "R"+cellname, "2" )
-
-        xofs=0
-        num=0
-        for curnet in netins:
-            et.SubElement(n_elements, 'element', name = "D"+cellname+str(num), library="discrete_logic_components", package="SOD-323", value="1N4148WS", x=str(x+0.75), y=str(y+1+3*1.75-xofs))
-            self.countcomponent("diode")
-            self.addcontact(netout , "D"+cellname+str(num), "A" )
-            self.addcontact(curnet , "D"+cellname+str(num), "C" )
-            self.devcounter += 1 
-            xofs = xofs + 1.75
-            num = num + 1
-
-    def insertNE555tbuf(self,x, y, netenable, netin, netout, cellname="void"):
-        """Insert npn transmission gate at position x,y. Voltage divider at output"""
-
-        y = y + 1.3 # center cell
-        n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname  , library="discrete_logic_components", package="SOT23"  , value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
-        et.SubElement(n_elements, 'element', name = "Rb"+cellname , library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+3.4))
-        et.SubElement(n_elements, 'element', name = "Rl"+cellname , library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1.65+2.5), y=str(y+1.4+2.1),rot="R90")
-        et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1.65+2.5), y=str(y+1.4-0.3),rot="R90")
-        self.countcomponent("npn transistor")
-        self.countcomponent("resistor",3)
-
-        self.addcontact(netin , "Q"+cellname  , "3" )
-        self.addcontact('VCC' , "Rl"+cellname , "2" )
-        self.addcontact('GND' , "Rl2"+cellname, "1" )
-
-        self.addcontact(netout , "Rl2"+cellname, "2" )
-
-        self.addcontact(netout    , "Rl"+cellname, "1" )
-        self.addcontact(netenable , "Rb"+cellname, "1" )
-
-        self.addcontact(netout , "Q"+cellname, "2")
-
-        self.addcontact("B$" + str(self.devcounter), "Q"+cellname, "1")
-        self.addcontact("B$" + str(self.devcounter), "Rb"+cellname, "2")
-
-        self.devcounter += 1        
 
     def insertIO(self,x, y, netin, name ="", pullup=False):
         """Insert I/O pin at position x,y"""
@@ -595,9 +480,11 @@ class CellArray():
             # nmos cells
             elif celltype == 'NM':                
                 board.insertNMOSinv(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
+            elif celltype == 'NMod': 
+                board.insertNMOSinv(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key,loadresistor=False)
             # hybrid cells
-            elif celltype == 'NMg':
-                board.insertNMOSinvg(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
+            # elif celltype == 'NMg':
+            #     board.insertNMOSinvg(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
             ## Generic cells
             elif celltype == 'EMPTY':
                 pass            
@@ -623,8 +510,8 @@ class CellArray():
                 board.insertLTLNOTo(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
             elif celltype == 'ltl_NOTs':
                 board.insertLTLNOTs(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
-            elif celltype == 'ltl_NOTb':
-                board.insertLTLNOTb(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
+            # elif celltype == 'ltl_NOTb':
+            #     board.insertLTLNOTb(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
             elif celltype == 'ltl_WAND1' or celltype == 'ltl_WAND2' or celltype == 'ltl_WAND3' or celltype == 'ltl_WAND4':
                 board.insertLTLwand(val.y*pitchx,val.x*pitchy, val.pin[:-1], val.pin[-1], key)
             else:
@@ -858,34 +745,34 @@ class CellArray():
             self.insertcell(name+"i" ,"NM"    ,   [nets[0] , nets[1]  , "GND"    ])
         elif celltype == "nm_NAND2":
             self.insertcell(name+"a" ,"NM"    ,   [nets[0] , nets[2]   , name+"x!" ])
-            self.insertcell(name+"b" ,"NM"    ,   [nets[1] , name+"x!" , "GND"     ])
+            self.insertcell(name+"b" ,"NMod"  ,   [nets[1] , name+"x!" , "GND"     ])
         elif celltype == "nm_NAND3":
             self.insertcell(name+"a" ,"NM"    ,   [nets[0] , nets[3]   , name+"x!" ])
-            self.insertcell(name+"b" ,"NM"    ,   [nets[1] , name+"x!" , name+"v!" ])
-            self.insertcell(name+"c" ,"NM"    ,   [nets[2] , name+"v!" , "GND"     ])
+            self.insertcell(name+"b" ,"NMod"  ,   [nets[1] , name+"x!" , name+"v!" ])
+            self.insertcell(name+"c" ,"NMod"  ,   [nets[2] , name+"v!" , "GND"     ])
         elif celltype == "nm_NOR2":
             self.insertcell(name+"a" ,"NM"    ,   [nets[0] , nets[2]  , "GND"    ])
-            self.insertcell(name+"b" ,"NM"    ,   [nets[1] , nets[2]  , "GND"    ])
+            self.insertcell(name+"b" ,"NMod"  ,   [nets[1] , nets[2]  , "GND"    ])
         elif celltype == "nm_NOR3":
             self.insertcell(name+"a" ,"NM"    ,   [nets[0] , nets[3]  , "GND"    ])
-            self.insertcell(name+"b" ,"NM"    ,   [nets[1] , nets[3]  , "GND"    ])
-            self.insertcell(name+"c" ,"NM"    ,   [nets[2] , nets[3]  , "GND"    ])
+            self.insertcell(name+"b" ,"NMod"  ,   [nets[1] , nets[3]  , "GND"    ])
+            self.insertcell(name+"c" ,"NMod"  ,   [nets[2] , nets[3]  , "GND"    ])
         elif celltype == "nm_AOI2_2":
             self.insertcell(name+"a" ,"NM"    ,   [nets[0] , nets[4]   , name+"x!" ])
-            self.insertcell(name+"b" ,"NM"    ,   [nets[1] , name+"x!" , "GND"     ])
-            self.insertcell(name+"c" ,"NM"    ,   [nets[2] , nets[4]   , name+"v!" ])
-            self.insertcell(name+"d" ,"NM"    ,   [nets[3] , name+"v!" , "GND"    ])
+            self.insertcell(name+"b" ,"NMod"  ,   [nets[1] , name+"x!" , "GND"     ])
+            self.insertcell(name+"c" ,"NMod"  ,   [nets[2] , nets[4]   , name+"v!" ])
+            self.insertcell(name+"d" ,"NMod"  ,   [nets[3] , name+"v!" , "GND"    ])
         elif celltype == "nm_AOI2_2_2":
             self.insertcell(name+"a" ,"NM"    ,   [nets[0] , nets[6]   , name+"x!" ])
-            self.insertcell(name+"b" ,"NM"    ,   [nets[1] , name+"x!" , "GND"     ])
-            self.insertcell(name+"c" ,"NM"    ,   [nets[2] , nets[6]   , name+"v!" ])
-            self.insertcell(name+"d" ,"NM"    ,   [nets[3] , name+"v!" , "GND"     ])
-            self.insertcell(name+"e" ,"NM"    ,   [nets[4] , nets[6]   , name+"u!" ])
-            self.insertcell(name+"f" ,"NM"    ,   [nets[5] , name+"u!" , "GND"     ])
+            self.insertcell(name+"b" ,"NMod"  ,   [nets[1] , name+"x!" , "GND"     ])
+            self.insertcell(name+"c" ,"NMod"  ,   [nets[2] , nets[6]   , name+"v!" ])
+            self.insertcell(name+"d" ,"NMod"  ,   [nets[3] , name+"v!" , "GND"     ])
+            self.insertcell(name+"e" ,"NMod"  ,   [nets[4] , nets[6]   , name+"u!" ])
+            self.insertcell(name+"f" ,"NMod"  ,   [nets[5] , name+"u!" , "GND"     ])
         elif celltype == "nm_AOI1_2":
             self.insertcell(name+"a" ,"NM"    ,   [nets[0] , nets[3]  , "GND"     ])
-            self.insertcell(name+"b" ,"NM"    ,   [nets[1] , nets[3]  , name+"x!" ])
-            self.insertcell(name+"c" ,"NM"    ,   [nets[2] , name+"x!" , "GND"    ])
+            self.insertcell(name+"b" ,"NMod"  ,   [nets[1] , nets[3]  , name+"x!" ])
+            self.insertcell(name+"c" ,"NMod"  ,   [nets[2] , name+"x!" , "GND"    ])
         #elif celltype == "nm_DFF":  # pin order: C, D, Q
         #    self.addlogiccell(name+"c","nm_NOT"    , [nets[0], name+"CI"])   # clock inversion
         #    self.addlogiccell(name+"a","nm_PHLATCH", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
@@ -904,6 +791,7 @@ class CellArray():
             self.addlogiccell(name+"d","nm_NAND2"  , [name+"c"  , name+"a"  , name+"d"  ])   
             self.addlogiccell(name+"e","nm_NAND2"  , [name+"b"  , nets[2]   , nets[3]   ])   
             self.addlogiccell(name+"f","nm_NAND2"  , [nets[3]   , name+"c"  , nets[2]   ])   
+
             self.peephole.append(["DFF_with_Qn", nets[2], nets[3] ])
             self.peephole.append(["DFF_with_Qn", nets[3], nets[2] ])
             # e = Qn, f = Q
@@ -926,42 +814,18 @@ class CellArray():
         #     def insertTBUF(self,x, y, netenable, netin, netout, cellname="void"):
         #     def insertNMOSinvg(self,x, y, netin, netgate, netdrain, cellname="void"):
 
-        elif celltype == "hy_XOR2":  
-            self.addlogiccell(name+"a","TBUFe" , [nets[0]   , nets[1]   , name+"x!" ])   
-            self.addlogiccell(name+"b","TBUFe" , [nets[1]   , nets[0]   , name+"x!" ])   
-            self.addlogiccell(name+"c","nm_NOT", [name+"x!"  , nets[2]] ) 
-        elif celltype == "hy_DFF7T":  # pin order: C, D, Q
-            self.addlogiccell(name+"c","nm_NOT", [nets[0], name+"CI"])   # clock inversion
-            self.addlogiccell(name+"a","hy_LATCH3Tn", [name+"CI", nets[1]  , name+"DI"])  # pin order: E, D, Q
-            self.addlogiccell(name+"b","hy_LATCH3Tn", [nets[0]  , name+"DI", nets[2]  ])  # pin order: E, D, Q
-        elif celltype == "hy_LATCH3Tn":  # pin order: E, D, Q
-            self.addlogiccell(name+"X1","TBUFe" , [nets[0]   , nets[1]   , name+"X1o" ])   
-            self.addlogiccell(name+"X2","NMg"   , [name+"X3o", name+"X1o", nets[2]    ])
-            self.addlogiccell(name+"X3","nm_NOT", [nets[2]   , name+"X3o"             ])    
-        # NE555 Logic
-        # Macrocells correspond to microcells -> direct insertion of ne_NOT
-        elif celltype == "ne_NOT":  
-           self.insertcell(name ,"ne_NOT"         ,   [nets[0] , nets[1] ])
-            # self.insertcell(name+"a" ,"ne_WAND1"    ,   [nets[0] , name+"!" ])
-            # self.insertcell(name+"b" ,"ne_NOT"      ,   [name+"!", nets[1]  ])
-        elif celltype == "ne_NAND2":
-            self.insertcell(name+"a" ,"ne_WAND2"   ,   [nets[0] , nets[1]  , name+"!" ])
-            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[2]  ])
-        elif celltype == "ne_NAND3":
-            self.insertcell(name+"a" ,"ne_WAND3"   ,   [nets[0] , nets[1]  , nets[2]  , name+"!" ])
-            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[3]  ])
-        elif celltype == "ne_NAND4":
-            self.insertcell(name+"a" ,"ne_WAND4"   ,   [nets[0] , nets[1]  , nets[2]  , nets[3]  , name+"!" ])
-            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[4]  ])
-        elif celltype == "ne_LATCH": # pin order: E, D, Q
-            self.insertcell(name+"a" ,"ne_TBUF"    ,   [nets[0] , nets[1]  , name+"!" ])
-            self.insertcell(name+"b" ,"ne_NOT"     ,   [name+"!", nets[2]  ])
-        elif celltype == "ne_DFF":  # pin order: C, D, Q
-            # Use common nclk net name to force removal of redundant inverters. Works in NE555 logic due to push/pull driver
-            # Do not insert clock inverter. NE555 designs requires two phase clock! 
-            # self.insertcell(name+"c","ne_NOT", [nets[0], "n_" + nets[0]])             # clock inversion
-            self.addlogiccell(name+"a","ne_LATCH", ["n_" + nets[0], nets[1], name+"DI!"])  # pin order: E, D, Q
-            self.addlogiccell(name+"b","ne_LATCH", [nets[0], name+"DI!", nets[2]])  # pin order: E, D, Q
+        # elif celltype == "hy_XOR2":  
+        #     self.addlogiccell(name+"a","TBUFe" , [nets[0]   , nets[1]   , name+"x!" ])   
+        #     self.addlogiccell(name+"b","TBUFe" , [nets[1]   , nets[0]   , name+"x!" ])   
+        #     self.addlogiccell(name+"c","nm_NOT", [name+"x!"  , nets[2]] ) 
+        # elif celltype == "hy_DFF7T":  # pin order: C, D, Q
+        #     self.addlogiccell(name+"c","nm_NOT", [nets[0], name+"CI"])   # clock inversion
+        #     self.addlogiccell(name+"a","hy_LATCH3Tn", [name+"CI", nets[1]  , name+"DI"])  # pin order: E, D, Q
+        #     self.addlogiccell(name+"b","hy_LATCH3Tn", [nets[0]  , name+"DI", nets[2]  ])  # pin order: E, D, Q
+        # elif celltype == "hy_LATCH3Tn":  # pin order: E, D, Q
+        #     self.addlogiccell(name+"X1","TBUFe" , [nets[0]   , nets[1]   , name+"X1o" ])   
+        #     self.addlogiccell(name+"X2","NMg"   , [name+"X3o", name+"X1o", nets[2]    ])
+        #     self.addlogiccell(name+"X3","nm_NOT", [nets[2]   , name+"X3o"             ])    
         # LTL
         elif celltype == "ltl_NOT":  
             self.insertcell(name+"a" ,"ltl_WAND1"   ,   [nets[0]  , name+"i!" ])
@@ -984,14 +848,23 @@ class CellArray():
             # self.addlogiccell(name+"a","ltl_LATCH3Tn", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
             # self.addlogiccell(name+"b","ltl_LATCH3Tn", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
         elif celltype == "ltl_DFFNP":  # pin order: C, D, Q, Qn
-            self.addlogiccell(name+"a","ltl_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])   
+#             self.addlogiccell(name+"a","ltl_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])   
+#             self.addlogiccell(name+"b","ltl_NAND3"  , [name+"a"  , nets[0]   , name+"c", name+"b" ])               
+#             self.addlogiccell(name+"c","ltl_NAND2"  , [nets[0]   , name+"d"  , name+"c"  ])   
+#             self.addlogiccell(name+"d","ltl_NAND2"  , [name+"c"  , name+"a"  , name+"d"  ])   
+#             self.addlogiccell(name+"e","ltl_NAND2"  , [name+"b"  , nets[2]   , nets[3]   ])   
+#             self.addlogiccell(name+"f","ltl_NAND2"  , [nets[3]   , name+"c"  , nets[2]   ])   
+
+            self.addlogiccell(name+"a","nm_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])   
             self.addlogiccell(name+"b","ltl_NAND3"  , [name+"a"  , nets[0]   , name+"c", name+"b" ])               
             self.addlogiccell(name+"c","ltl_NAND2"  , [nets[0]   , name+"d"  , name+"c"  ])   
             self.addlogiccell(name+"d","ltl_NAND2"  , [name+"c"  , name+"a"  , name+"d"  ])   
             self.addlogiccell(name+"e","ltl_NAND2"  , [name+"b"  , nets[2]   , nets[3]   ])   
             self.addlogiccell(name+"f","ltl_NAND2"  , [nets[3]   , name+"c"  , nets[2]   ])   
-            self.peephole.append(["DFF_with_Qn", nets[2], nets[3] ])
-            self.peephole.append(["DFF_with_Qn", nets[3], nets[2] ])
+
+
+            # self.peephole.append(["DFF_with_Qn", nets[2], nets[3] ])
+            # self.peephole.append(["DFF_with_Qn", nets[3], nets[2] ])
             # e = Qn, f = Q
         elif celltype == "ltl_DFFNP_CLR":  # pin order: C, nRes, D, Q, Qn
             self.addlogiccell(name+"a","ltl_NAND3"  , [nets[2]   , name+"b"  , nets[1]  , name+"a"   ])   
@@ -1070,7 +943,7 @@ class CellArray():
 
             # Optimize for pin positions
             if self.array[currentcell].geometry == "horizontal":  # cell with horizontal input/output
-                if self.array[currentcell].type == "NM":
+                if self.array[currentcell].type[0:2] == "NM": # Net order is G D S,  Right: D, Left G,S
                     ypos = ypos + 0.5 * (1 if self.array[currentcell].pin[1] == netname else -1)
                 elif self.array[currentcell].pin[-1] == netname: 
                     ypos = ypos + 0.5 # net is on output (right side of cell)
@@ -1164,8 +1037,8 @@ class CellArray():
 
                     print(f"Removed cells {cellkey1},{cellkey2}, integrated net: {endnet} into {item[2]}")
                     continue
-                # RTL
-                for cellkey in [key for key,val in self.array.items() if ( val.type == "rt_NOT" or val.type == "rtpg_NOT" or val.type == "nm") and val.pin[0] == item[1]]:
+                # RTL, nmos, RTPG
+                for cellkey in [key for key,val in self.array.items() if ( val.type == "rt_NOT" or val.type == "rtpg_NOT" or val.type == "NM") and val.pin[0] == item[1]]:
                     if cellkey[-1:] == 'i':
                         endnet = self.array[cellkey].pin[1] 
                     

@@ -99,48 +99,9 @@ R1 VCC A {RL}
 .ENDS IOP
 
 ********************************************************************************
-* NE logic
+* LTL
 ********************************************************************************
 
-.SUBCKT ne_NOT A Y   
-XU1 A N001 A VCC Y NC_01 VCC 0 TLC55X
-C1 VCC 0 100n
-.ENDS ne_NOT
-
-.SUBCKT ne_ANDN2 A B Y   
-XU1 B N001 B A Y NC_01 VCC 0 TLC55X
-C1 VCC 0 100n
-.ENDS ne_ANDN2
-
-.SUBCKT ne_WAND2 A B Y
-R1 VCC Y {RL}
-D1 Y A RTL_DIODE
-D2 Y B RTL_DIODE
-.ENDS ne_WAND2
-
-.SUBCKT ne_WAND3 A B C Y
-R1 VCC Y {RL}
-D1 Y A RTL_DIODE
-D2 Y B RTL_DIODE
-D3 Y C RTL_DIODE
-.ENDS ne_WAND3
-
-.SUBCKT ne_WAND4 A B C D Y
-R1 VCC Y {RL}
-D1 Y A RTL_DIODE
-D2 Y B RTL_DIODE
-D3 Y C RTL_DIODE
-D4 Y D RTL_DIODE
-.ENDS ne_WAND4
-
-.SUBCKT ne_TBUF E A Y
-Q1 A P001 Y 0 RTL_NPN
-R1 Y 0 {RL}
-R2 VCC Y {RL}
-R3 E P001 {RL}
-.ENDS DLATCH
-
-* LTL
 .SUBCKT ltl_NOTs A Y
 Q1 Y N001 VEE 0 RTL_NPN
 R1 VCC Y {RL}
