@@ -231,8 +231,8 @@
                             <wire x1="-0.4" y1="0.375" x2="-0.4" y2="-0.35" width="0.1016" layer="51"/>
                             <wire x1="0.4" y1="0.35" x2="0.4" y2="-0.35" width="0.1016" layer="51"/>
                             <circle x="-0.35" y="0.625" radius="0.075" width="0.0508" layer="51"/>
-                            <smd name="C" x="0" y="0.75" dx="0.8" dy="0.8" layer="1"/>
-                            <smd name="A" x="0" y="-0.75" dx="0.8" dy="0.8" layer="1"/>
+                            <smd name="C" x="0" y="0.85" dx="0.8" dy="0.8" layer="1"/>
+                            <smd name="A" x="0" y="-0.85" dx="0.8" dy="0.8" layer="1"/>
                             <rectangle x1="-0.45" y1="0.7" x2="-0.25" y2="0.85" layer="51"/>
                             <rectangle x1="-0.275" y1="0.55" x2="-0.225" y2="0.6" layer="51"/>
                             <rectangle x1="-0.45" y1="0.35" x2="-0.4" y2="0.725" layer="51"/>
