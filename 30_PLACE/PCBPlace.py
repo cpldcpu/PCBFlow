@@ -120,7 +120,7 @@ class PCBPlacer():
         supply nets are VCC and GND."""
 
         n_elements = self.n_board.find('elements')
-        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.65), y=str(y+1.4))
+        et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23", value="PMBT2369", x=str(x+1.55), y=str(y+1.4))
         et.SubElement(n_elements, 'element', name = "L"+cellname, library="discrete_logic_components", package="LED0603", value="LEDW", x=str(x+1.17), y=str(y+3.63) ,rot="R270")
         self.countcomponent("npn transistor")
         self.countcomponent("led")
@@ -495,16 +495,6 @@ class CellArray():
             # LED
             elif celltype == 'LED':
                 board.insertLED(val.y*pitchx,val.x*pitchy,val.pin[0],key)
-            # NE555
-            #  def insertNE555tbuf(self,x, y, netenable, netin, netout, cellname="void"):
-            elif celltype == 'ne_NOT':
-                board.insertNE555not(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
-            elif celltype == 'ne_ANDN2':
-                board.insertNE555andn2(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
-            elif celltype == 'ne_WAND1' or celltype == 'ne_WAND2' or celltype == 'ne_WAND3' or celltype == 'ne_WAND4':
-                board.insertNE555wand(val.y*pitchx,val.x*pitchy, val.pin[:-1], val.pin[-1], key)
-            elif celltype == 'ne_TBUF':
-                board.insertNE555tbuf(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],val.pin[2],key)
             # LTL                
             elif celltype == 'ltl_NOTo':
                 board.insertLTLNOTo(val.y*pitchx,val.x*pitchy,val.pin[0],val.pin[1],key)
@@ -617,10 +607,6 @@ class CellArray():
             self.insertcell(name+"d","rt_NOT", [name+"CI", name+"CNI"])   # clock inversion
             self.addlogiccell(name+"a","PHLATCH", [name+"CI" , nets[1]  , name+"DI"])  # pin order: E, D, Q
             self.addlogiccell(name+"b","PHLATCH", [name+"CNI", name+"DI", nets[2]  ])  # pin order: E, D, Q
-        # elif celltype == "DFF7T":  # pin order: C, D, Q
-        #     self.insertcell(name+"c","rt_NOT", [nets[0], name+"CI"])   # clock inversion
-        #     self.addlogiccell(name+"a","LATCH3Tn", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
-        #     self.addlogiccell(name+"b","LATCH3Tn", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
         elif celltype == "PHLATCH":  # pin order: E, D, Q
             self.insertcell(name+"I","rt_NOT", [nets[0], name+"CI"])   # clock inversion (cannot be shared in DFF due to tpd requirements)
             self.addlogiccell(name+"X1","rt_NOR2", [name+"CI" , nets[1]   , name+"X1o"])  # X1: D,CI,X1o
@@ -806,26 +792,6 @@ class CellArray():
             self.peephole.append(["DFF_with_Qn", nets[4], nets[3] ])
             # e = Qn, f = Q
 
-        # Experimental 5T PH Latch. Requires tuning gate speeds, which does not work in this framework
-        # elif celltype == "nm_5TLATCH":  # pin order: E, D, Q            
-        #     self.addlogiccell(name+"X1","nm_NOR2" ,[nets[0]      , nets[2]   , name+"X1o"])  
-        #     self.addlogiccell(name+"X2","nm_AOI1_2",[name+"X1o"   , nets[0]   , nets[1]  ,  nets[2]])  
-        # Hybrid gates (bipolar pass gate + nmos )
-        #     def insertTBUF(self,x, y, netenable, netin, netout, cellname="void"):
-        #     def insertNMOSinvg(self,x, y, netin, netgate, netdrain, cellname="void"):
-
-        # elif celltype == "hy_XOR2":  
-        #     self.addlogiccell(name+"a","TBUFe" , [nets[0]   , nets[1]   , name+"x!" ])   
-        #     self.addlogiccell(name+"b","TBUFe" , [nets[1]   , nets[0]   , name+"x!" ])   
-        #     self.addlogiccell(name+"c","nm_NOT", [name+"x!"  , nets[2]] ) 
-        # elif celltype == "hy_DFF7T":  # pin order: C, D, Q
-        #     self.addlogiccell(name+"c","nm_NOT", [nets[0], name+"CI"])   # clock inversion
-        #     self.addlogiccell(name+"a","hy_LATCH3Tn", [name+"CI", nets[1]  , name+"DI"])  # pin order: E, D, Q
-        #     self.addlogiccell(name+"b","hy_LATCH3Tn", [nets[0]  , name+"DI", nets[2]  ])  # pin order: E, D, Q
-        # elif celltype == "hy_LATCH3Tn":  # pin order: E, D, Q
-        #     self.addlogiccell(name+"X1","TBUFe" , [nets[0]   , nets[1]   , name+"X1o" ])   
-        #     self.addlogiccell(name+"X2","NMg"   , [name+"X3o", name+"X1o", nets[2]    ])
-        #     self.addlogiccell(name+"X3","nm_NOT", [nets[2]   , name+"X3o"             ])    
         # LTL
         elif celltype == "ltl_NOT":  
             self.insertcell(name+"a" ,"ltl_WAND1"   ,   [nets[0]  , name+"i!" ])
@@ -839,30 +805,14 @@ class CellArray():
         elif celltype == "ltl_NAND4":
             self.insertcell(name+"a" ,"ltl_WAND4"   ,   [nets[0]  , nets[1]   , nets[2]  , nets[3]  , name+"i!" ])
             self.insertcell(name+"b" ,"ltl_NOTs"    ,   [name+"i!", nets[4]   ])
-        elif celltype == "ltl_LATCH3Tn":  # pin order: E, D, Q
-            self.addlogiccell(name+"a","TBUFc"      , [nets[0]    , nets[1]    , name+"X1o!" ])   
-            self.addlogiccell(name+"b","ltl_NOTb"   , [name+"X3o!", name+"X1o!", nets[2]     ])
-            self.addlogiccell(name+"c","ltl_NOTs"   , [nets[2]    , name+"X3o!"              ])    
-        # elif celltype == "ltl_DFF":  # pin order: C, D, Q
-        #     self.addlogiccell(name+"c","ltl_NOT", [nets[0], name+"CI"])   # clock inversion
-            # self.addlogiccell(name+"a","ltl_LATCH3Tn", [name+"CI", nets[1], name+"DI"])  # pin order: E, D, Q
-            # self.addlogiccell(name+"b","ltl_LATCH3Tn", [nets[0], name+"DI", nets[2]])  # pin order: E, D, Q
         elif celltype == "ltl_DFFNP":  # pin order: C, D, Q, Qn
-#             self.addlogiccell(name+"a","ltl_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])   
-#             self.addlogiccell(name+"b","ltl_NAND3"  , [name+"a"  , nets[0]   , name+"c", name+"b" ])               
-#             self.addlogiccell(name+"c","ltl_NAND2"  , [nets[0]   , name+"d"  , name+"c"  ])   
-#             self.addlogiccell(name+"d","ltl_NAND2"  , [name+"c"  , name+"a"  , name+"d"  ])   
-#             self.addlogiccell(name+"e","ltl_NAND2"  , [name+"b"  , nets[2]   , nets[3]   ])   
-#             self.addlogiccell(name+"f","ltl_NAND2"  , [nets[3]   , name+"c"  , nets[2]   ])   
-
+#            self.addlogiccell(name+"a","ltl_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])     # pure LTL version fail simulation, but works in circuit
             self.addlogiccell(name+"a","nm_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])   
             self.addlogiccell(name+"b","ltl_NAND3"  , [name+"a"  , nets[0]   , name+"c", name+"b" ])               
             self.addlogiccell(name+"c","ltl_NAND2"  , [nets[0]   , name+"d"  , name+"c"  ])   
             self.addlogiccell(name+"d","ltl_NAND2"  , [name+"c"  , name+"a"  , name+"d"  ])   
             self.addlogiccell(name+"e","ltl_NAND2"  , [name+"b"  , nets[2]   , nets[3]   ])   
             self.addlogiccell(name+"f","ltl_NAND2"  , [nets[3]   , name+"c"  , nets[2]   ])   
-
-
             # self.peephole.append(["DFF_with_Qn", nets[2], nets[3] ])
             # self.peephole.append(["DFF_with_Qn", nets[3], nets[2] ])
             # e = Qn, f = Q

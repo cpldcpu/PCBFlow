@@ -12,7 +12,7 @@
   - Latch: CDC6600-Style Polarity hold latch
   - DFF: Master-Slave DFF based on PH-Latch 
   - DFF: 6x NOR DFF_PN
-- Minimum Cell size: 0.15" x 0.25"
+- Cell size: 0.15" x 0.25"
 - Recommended components: PMBT2369, RL=3.3k, RB=3.3k, Cp=22p for 5V. 
   
 ### Post Layout Simulation of counter.vhd
@@ -43,7 +43,7 @@
 - Achieves 300-500kHz with MMBT3904 clones (e.g. CJ)
 - Supported gates: NOT, NOR2, NOR3, NOR4, XOR2
 - Flip-Flop: 3T master slave FF with pass gate
-- Minimum cell size: 0.15" x 0.25"
+- Cell size: 0.15" x 0.25"
 - Recommended Components: MMBT3904, Rl=3.3k, Rb=10k for 5V (FOmax=4). **Attention**: PMBT2369 will not work in this logic style due to too low reverse beta
   
 ### Post Layout Simulation of counter.vhd
@@ -73,9 +73,9 @@
 
 - NMOS logic based on power mosfet supporting wide number of gate types at low component count. Relatively robust, but slow.
 - Can achive 500kHz-2 MHz with counter depending on transitor type 
-- Supported gates: NOT, NOR2, NOR3, NAND2,NAND3, AOI2_2, AOI1_2, AOI2_2_2
+- Supported gates: NOT, NOR2, NOR3, NAND2, NAND3, AOI2_2, AOI1_2, AOI2_2_2
 - Flip-Flop: 6x NAND with clear
-- Minimum cell size: 0.15" x 0.25"
+- Cell size: 0.15" x 0.25"
 - Recommended Components: 
   - low cost: 2N7002, Rl=1k, 
   - High speed: FDV301/DMG301, Rl=1K
@@ -94,9 +94,7 @@
    - clock-to-out0 delay rise: 65.3 ns fall: 67.9 ns
 
 ### TODO
--   Move RL to output -> done
 -   Clock distribution
--   Double check DFF implementation -> done
 
 ---
 # LTL - LED Transistor Logic
@@ -114,6 +112,12 @@
    - Functional: Pass
    - Fmax: 1.17 MHZ @ 66.6 mA  (RL=2.2k: Fmax=0.55 MHz@30 mA)
    - clock-to-out0 delay rise: 77.8 ns fall: 183 ns
+
+### TODO
+- Fix and validate LED spice models for post layout simulation
+- Clock distribution
+
+---
 # amux - analog multiplexer logic
 
 ### TODO
@@ -126,17 +130,19 @@
 ## 74LVC - 74LVC single gate logic
 
 - Using single gate logic: 74LVC1G175 and 74LVC1G57 multi gates. Very versatile and area efficient, however 1G57 is not always easy to obtain and expensive. Rather use amux logic. Not PCB proven yet
+- 
 
 ## YG -    YG strip logic
 
 - not finished
-
+- removed to clean up before refactoring
 ## NE  -    NE555 logic
 
-- Don't use, this is more of a joke. It works, but is slow, large, expensive and power hungry.
+- More of a joke
 - Removed to declutter source
 
 ## hybrid - hybrid nmos/bipolar logic
 
 - Nasty logic level, neither fast nor stable. Don't use.
+- Removed to declutter before refactoring
 

@@ -42,8 +42,6 @@ elif [ "$APP" == "amux" ]; then
     echo "Synthesizing to analog multiplexer logic"
 elif [ "$APP" == "74LVC" ]; then
     echo "Synthesizing to single gate TTL logic (74LVC)"
-elif [ "$APP" == "YG" ]; then
-    echo "Synthesizing to YG strip logic"
 elif [ "$APP" == "LTL" ]; then
     echo "Synthesizing to LED²-Transistor-Logic"
 else
