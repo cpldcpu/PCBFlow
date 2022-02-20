@@ -9,26 +9,26 @@ architecture testmain of testbench is
 
   component counterx is
     port (clk:	in	std_logic;
-        rst:	in	std_logic;
+        nrst:	in	std_logic;
         count: out std_logic_vector(2 downto 0)
     );
   end component;
 
-  signal clk,rst:  std_logic;
+  signal clk,nrst:  std_logic;
   signal count:    std_logic_vector(2 downto 0);
 
 begin 
 
-ctr:  counterx  port map(clk => clk, rst => rst, count => count);
+ctr:  counterx  port map(clk => clk, nrst => nrst, count => count);
 
   process    
   begin
-    rst <= '1';
+    nrst <= '0';
     clk <= '0';
     WAIT FOR 50 ns;
     clk <= '1';
     WAIT FOR 50 ns;
-    rst <= '0';
+    nrst <= '1';
 
     loop
       clk <= '0';
