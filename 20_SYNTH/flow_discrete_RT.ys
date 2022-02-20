@@ -21,6 +21,7 @@ tribuf
 
 # Technology mapping
 techmap
+techmap -map ../20_SYNTH/discrete_RT_techmap.v   # map TBUF
 
 # Work around to map DFF with sync set/reset, since this is not possible in liberty file
 # proc; opt;

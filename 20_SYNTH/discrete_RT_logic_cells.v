@@ -10,12 +10,17 @@ output Y;
 assign Y = A;
 endmodule
 
+module rt_TBUF_N(A, nE, Y);
+input A, nE;
+output Y;
+assign Y = nE ? 1'bZ : A ;
+endmodule
+
 module rt_NOT(A, Y);
 input A;
 output Y;
 assign Y = ~A;
 endmodule
-
 
 module rt_XOR2(A, B, Y);
 input A, B;

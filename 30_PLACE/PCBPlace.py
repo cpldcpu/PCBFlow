@@ -602,9 +602,12 @@ class CellArray():
             self.insertcell(name+"a","rt_NOT", [nets[0], nets[3]])
             self.insertcell(name+"b","rt_NOT", [nets[1], nets[3]])
             self.insertcell(name+"c","rt_NOT", [nets[2], nets[3]])
+        elif celltype == "rt_TBUF_N":
+            self.addlogiccell(name+"a","rt_NOR2", [nets[0] , nets[1], name+"a"])
+            self.addlogiccell(name+"b","rt_NOT" , [name+"a", nets[2] ])
         elif celltype == "rt_DFF":  # pin order: C, D, Q
-            self.insertcell(name+"c#","rt_NOT", [nets[0]  , name+"CI"] )   # clock inversion
-            self.insertcell(name+"d","rt_NOT", [name+"CI", name+"CNI"])   # clock inversion
+            self.insertcell(name+"c#","rt_NOT", [nets[0]  , name+"CI" ])   # clock inversion
+            self.insertcell(name+"d" ,"rt_NOT", [name+"CI", name+"CNI"])   # clock inversion
             self.addlogiccell(name+"a","PHLATCH", [name+"CI" , nets[1]  , name+"DI"])  # pin order: E, D, Q
             self.addlogiccell(name+"b","PHLATCH", [name+"CNI", name+"DI", nets[2]  ])  # pin order: E, D, Q
         elif celltype == "PHLATCH":  # pin order: E, D, Q
@@ -1129,8 +1132,8 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 7        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 70        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 28        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 720        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
@@ -1146,7 +1149,7 @@ Pullups     = []      # Default, don't insert pull up resistors
 
 # Optimizer settings. Only change when needed
 
-AreaMargin = 0.5       # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
+AreaMargin = 0.2       # This is additional area that is reserved for empty cells. This value should be larger than zero to allow optimization.
                         # Too large values will result in waste of area. Default: 0.3
 CoarseAttempts = 20     # Default: 20
 CoarseCycles   = 1000   # Default: 1000
@@ -1165,12 +1168,12 @@ PCBPitchy = 2.54*2.5 #
 
 # File names. Don't touch unless you want to modify the flow
 
-InputFileName = "209_synthesized_output.sp"
-PCBTemplateFile = "../30_PLACE/board_template.brd" 
-PCBOutputFile = "309_board_output.brd"
-SpiceOutputFile = "308_extracted_netlist.sp"
-FanoutOutputFile = "307_fanout.txt"
-NetsOutputFile  = "306_nets.csv"
+InputFileName       = "209_synthesized_output.sp"
+PCBTemplateFile     = "../30_PLACE/board_template.brd" 
+PCBOutputFile       = "309_board_output.brd"
+SpiceOutputFile     = "308_extracted_netlist.sp"
+FanoutOutputFile    = "307_fanout.txt"
+NetsOutputFile      = "306_nets.csv"
 PlacementOutputFile = "305_placement.csv"
 
 # =========== START OF MAIN ===============================

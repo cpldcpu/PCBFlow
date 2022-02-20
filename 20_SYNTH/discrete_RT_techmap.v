@@ -27,9 +27,9 @@ LATCH_N _TECHMAP_REPLACE_ (
 endmodule
 
 module \$_TBUF_ (input A, input E, output Y);
-TBUF _TECHMAP_REPLACE_ (
+rt_TBUF_N _TECHMAP_REPLACE_ (
 .A(A),
-.E(E),
+.E(!E),
 .Y(Y)
 );
 endmodule
