@@ -13,6 +13,8 @@ D-Flop:
 
 
 library(SingleLogicCells) {
+
+  default_fanout_load : 1.0;
   
   cell(BUF) {
     area: 6;
@@ -27,13 +29,15 @@ library(SingleLogicCells) {
     pin(nE) { direction: input; }
     pin(Y) { direction: output;
         function : "A";
-        three_state : "~nE"; }
+        three_state : "nE'"; }
   }
 
   cell(rt_NOT) {
     area: 1;
-    pin(A) { direction: input; }
+    pin(A) { direction: input; 
+              fanout_load : 1 ;}
     pin(Y) { direction: output;
+              max_fanout : 8 ;
               function: "A'"; }
   }
 
@@ -42,6 +46,7 @@ library(SingleLogicCells) {
     pin(A) { direction: input; }
     pin(B) { direction: input; }
     pin(Y) { direction: output;
+              max_fanout : 8 ;
              function: "(A+B)'"; }
   }
 
@@ -51,28 +56,9 @@ library(SingleLogicCells) {
     pin(B) { direction: input; }
     pin(C) { direction: input; }
     pin(Y) { direction: output;
+             max_fanout : 8 ;
              function: "(A+B+C)'"; }
   }
-/*
-  cell(rt_XOR2) {
-    area: 3;
-    pin(A) { direction: input; }
-    pin(B) { direction: input; }
-    pin(Y) { direction: output;
-             function: "(A^B)"; }
-  }
-
-  cell(rt_DFF7T) {
-    area: 7;
-    ff(IQ, IQN) { clocked_on: C;
-                  next_state: D; }
-    pin(C) { direction: input;
-                 clock: true; }
-    pin(D) { direction: input; }
-    pin(Q) { direction: output;
-              function: "IQ"; }
-  }
-*/
 /*
 // PH-Master Slave FF
   cell(rt_DFF) {

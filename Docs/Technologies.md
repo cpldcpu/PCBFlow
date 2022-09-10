@@ -6,12 +6,13 @@
 - "CDC6600 style RTL logic"
 - High performance NOR based logic with high power consumption and medium area.
 - Balanced voltage levels by using pull ups on inputs.
+- Reach through capacitor to speed up switching.
 - Can achieve ~10 MHz with counter.vhd
 - Supported gates: NOT, NOR2, NOR3, NOR4
 - Flip-Flop: 
+  - DFF: 6x NOR DFF_PN (Default)
   - Latch: CDC6600-Style Polarity hold latch
   - DFF: Master-Slave DFF based on PH-Latch 
-  - DFF: 6x NOR DFF_PN
 - Cell size: 0.15" x 0.25"
 - Recommended components: PMBT2369, RL=3.3k, RB=3.3k, Cp=22p for 5V. 
   
@@ -31,13 +32,12 @@
 
 ### TODO
 -   Clock distribution -> new dff has clock buffer. Manage fanout ?
--   Change to 6xNOR DFF with sync reset? -> done, significant improvement in area and speed.
 
 ---
 
 # RTPG  -  Bipolar Resistor Transistor Logic with pass gates
 
-- Low speed logic optimized for low component count. **Attention:** USe with care: High Fan out may create nonfunctional circuit. 
+- Low speed logic optimized for low component count. **Attention:** Use with care: High Fan out may create nonfunctional circuit. 
 - Uses NOR style logic with additional "artistic" gates based on pass-gate NPN transistors.
 - No voltage balancing, instead strong high level to allow fan out. 
 - Achieves 300-500kHz with MMBT3904 clones (e.g. CJ)
@@ -81,7 +81,7 @@
   - High speed: FDV301/DMG301, Rl=1K
 - Is very noisy on supply. Some improvement of speed/power trade-off could be achieved by balancing the load resistor for fanout.
 ### Post Layout Simulation of counter.vhd
-1) MMBT7002/1k/DFF7T @5V
+1) 2N7002/1k/DFF7T @5V
    - 58 micro-cells (58 transistor, 27 resistor)
    - Functional: Pass
    - Fmax: 1.17 MHZ @ 66.6 mA  (RL=2.2k: Fmax=0.55 MHz@30 mA)
@@ -108,10 +108,10 @@
 
 ### Post Layout Simulation of counter.vhd
 1) PMBT2369/1.8k/3.3k @5V
-   - 58 micro-cells (58 transistor, 27 resistor)
-   - Functional: Pass
-   - Fmax: 1.17 MHZ @ 66.6 mA  (RL=2.2k: Fmax=0.55 MHz@30 mA)
-   - clock-to-out0 delay rise: 77.8 ns fall: 183 ns
+   - xx micro-cells (xx)
+   - Functional: xx
+   - Fmax: xx MHZ @ 66.6 mA  (RL=2.2k: Fmax=0.55 MHz@30 mA)
+   - clock-to-out0 delay rise: xx ns fall: xx ns
 
 ### TODO
 - Fix and validate LED spice models for post layout simulation

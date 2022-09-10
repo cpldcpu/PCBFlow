@@ -20,9 +20,12 @@ show -format pdf -prefix 200_diagramm_hdl_elaborated
 tribuf
 
 # Technology mapping
-techmap
-techmap -map ../20_SYNTH/discrete_RT_techmap.v   # map TBUF
+techmap -map ../20_SYNTH/discrete_RT_techmap.v  # map add
+techmap 
+techmap -map ../20_SYNTH/discrete_RT_techmap.v  # map TBUF
 
+
+stat
 # Work around to map DFF with sync set/reset, since this is not possible in liberty file
 # proc; opt;
 # dfflegalize -cell $_SDFF_NP0_ x 
@@ -31,7 +34,9 @@ techmap -map ../20_SYNTH/discrete_RT_techmap.v   # map TBUF
 proc; opt; fsm; opt; 
 dfflibmap -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib
 proc; opt; 
+#abc -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib -constr  ../20_SYNTH/discrete_RT.constr # -script +strash;dretime;map,{D};buffer
 abc -liberty ../20_SYNTH/discrete_RT_logic_liberty.lib
+
 opt_clean -purge
 
 # Print Statistics

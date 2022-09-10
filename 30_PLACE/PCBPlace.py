@@ -1,5 +1,5 @@
-# PCBPlace v0.5a
-# 22-Jan-03 cpldcpu
+# PCBPlace 
+# 2021/2022 www.github.com/cpldcpu
 #
 # Very hacky early state, in urgent need of refactoring
 
@@ -585,11 +585,12 @@ class CellArray():
                 return
         raise CAParsingError("Could not insert LED cell for NET: "+str(net))
         
-    def addlogiccell(self,name,celltype, nets):
+    def addlogiccell(self,name:str,celltype:str, nets:list) -> None:
         """ Add logic cell. Complex cells are recursively broken down into less complex microcells.
         Special netnames:
           Ending with '!' - local net, cells should be close together
           Ending with '#' - global shared net. To be merged by net optimizer.
+          Ending with 'B' - Buffered and duplicated net
         """
 
         # RTL cells
@@ -863,7 +864,7 @@ class CellArray():
 
         self.replacenet(replacenet, replacewith)
 
-    def rebuildnets(self):
+    def rebuildnets(self) -> None:
         """ Rebuild list of nets from cellarray."""
         self.nets = {}
         self.totallength = 0
@@ -944,7 +945,7 @@ class CellArray():
             lenafter += self.nets[net][0]
         self.totallength += lenafter - lenbefore
     
-    def removecell(self, cellkey):
+    def removecell(self, cellkey:str) -> None:
         """Removes a cell from the grid and replaces it with an empty one
 
         Args:
@@ -1014,7 +1015,7 @@ class CellArray():
             if self.totallength > oldnetlength:
                 self.swapcells(cell1,cell2)
 
-    def optimizesimulatedannealing(self, iterations = 1000, temperature = 1):
+    def optimizesimulatedannealing(self, iterations:int = 1000, temperature:float = 1) -> None:
         """ Optimize by simulated annealing. """
         for i in range(iterations):
             cell1, cell2 = random.sample(self.array.keys(),2)
@@ -1067,7 +1068,7 @@ def parsesptocellarray(filename, startarray:CellArray,FixedIO=[],LEDS=[],Pullups
                 print("Exception message:",errtype)
                 exit()
 
-def coarseoptimization(startarray, attempts=20, initialtemp=1000, coolingrate=0.95, optimizationcycles = 1000):
+def coarseoptimization(startarray:CellArray, attempts:int=20, initialtemp:float=1000, coolingrate:float=0.95, optimizationcycles:int = 1000) -> CellArray:
     """ Perform initial optimization on the array. 
     Several attempts with different random seeds are started, the best result is returned.
 
@@ -1126,14 +1127,92 @@ def detailedoptimization(startarray, initialtemp=1, coolingrate=0.95, optimizati
 
     return startarray
 
+def bufferinsertion(array_in: CellArray,netkey:str,maxfo:int=8) -> bool:
+    """ insert buffers into net designated with "netkey".
+
+    Args:
+        array_opt (CellArray): array
+        netkey (str): net for buffer insertion
+        maxfo (int, optional): _description_. Defaults to 8.
+
+    Returns:
+        bool: True if 
+    """
+
+# for netkey, data in array_opt.nets.items():
+    data=array_in.nets[netkey]
+
+    cells = data[1]
+    generatorcells = [cellkey for cellkey in cells if array_in.array[cellkey].pin[-1]==netkey]
+    consumercells  = [cellkey for cellkey in cells if array_in.array[cellkey].pin[-1]!=netkey]
+    # consumercellsx = [array_opt.array[key].x for key in consumercells]
+    # consumercellsy = [array_opt.array[key].y for key in consumercells]
+
+    # print(f"Net: {netkey} Generator: {generatorcells} Consumer: {consumercells}")
+    # print(consumercellsx,consumercellsy)
+    numclusters = int( len(consumercells) / maxfo + 1)
+
+    print(f">Net:{netkey} Length:{len(consumercells)} Drivercells:{generatorcells} ",end='')       
+
+    if len(generatorcells)==1 and generatorcells[0][-1]=="i":       # Select only nets that are driven by single inverters
+        # print("Net is driven by single inverter")
+    # Identify best clustering of consumercells according to layout
+    # This is a size constrained k-means clustering problem
+    # Since the set size is small we will just try random exchange optimization     
+
+        subclusters = np.array_split(consumercells, numclusters)
+        bestsumsquares = 1e10
+
+        for i in range(10000):
+
+            idc1, idc2 = random.sample(range(len(subclusters)),2)
+            idx1 = random.sample(range( len( subclusters[idc1] )),1)      
+            idx2 = random.sample(range( len( subclusters[idc2] )),1)      
+
+            subclusters[idc1][idx1], subclusters[idc2][idx2] = subclusters[idc2][idx2], subclusters[idc1][idx1]
+
+            sumsquares = 0
+            for cluster in subclusters:
+                meanx=np.mean([array_opt.array[key].x for key in cluster])
+                meany=np.mean([array_opt.array[key].y for key in cluster])
+                sumsquares +=np.sum([(array_opt.array[key].x-meanx)**2 for key in cluster]) + np.sum([(array_opt.array[key].y-meany)**2 for key in cluster])
+
+            delta = sumsquares - bestsumsquares
+
+            if delta < 0:
+                bestsumsquares=sumsquares
+                # print(bestsumsquares,i)       
+            else:
+                subclusters[idc1][idx1], subclusters[idc2][idx2] = subclusters[idc2][idx2], subclusters[idc1][idx1]
+
+        numdix = 0
+        sourcenet = array_in.array[generatorcells[0]].pin[0]
+        celltype  = array_in.array[generatorcells[0]].type
+        numcluster=len(subclusters)
+        print(f">Sourcenet: {sourcenet} Inserting {numcluster} subnets")
+        # celltype  = "rt_NOT"
+        for cluster in subclusters:
+            replacenet  = netkey
+            replacewith = netkey + "B" + str(numdix)
+            array_in.addlogiccell(generatorcells[0] + "B" +str(numdix), celltype, [sourcenet, replacewith])
+            numdix +=1
+            for curcell in cluster:
+                array_in.array[curcell].pin = [replacewith if net==replacenet else net for net in array_in.array[curcell].pin]
+
+        array_in.removecell(generatorcells[0])
+        # print(*subclusters)
+        return True
+    print(">Net not driven by inverter")
+    return False
+
 # ====================================================================
 # Configuration area. Will be turned into commandline settings later
 # ====================================================================
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 28        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 720        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 20        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 740        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
@@ -1154,6 +1233,8 @@ AreaMargin = 0.2       # This is additional area that is reserved for empty cell
 CoarseAttempts = 20     # Default: 20
 CoarseCycles   = 1000   # Default: 1000
 FineCycles     = 10000  # Default: 10000 Increase to improve larger designs. 
+
+MaxFanOut      = 10    # Default:10  Buffers will be inserted into eligible nets with higher fanout than this
 
 # Pitch of grid on PCB in mm
 
@@ -1238,9 +1319,41 @@ print("Elapsed time: {0:6.3f}s".format(end-start))
 print()
 # array_opt.printarray()
 
+print("=== Buffer insertion ===\n")
+
+start = time.time()
+
+for netkey, data in array_opt.nets.items():
+    if len(data[1])>MaxFanOut:
+        bufferinsertion(array_opt, netkey,maxfo=MaxFanOut)
+
+array_opt.rebuildnets()
+end = time.time()
+
+print("Elapsed time: {0:6.3f}s".format(end-start))
+print()
+
+print("=== Optimizing buffer cell placement ===\n")
+
+array_opt.optimizationrules([20,2.5,1])
+
+print("Initial length:", array_opt.totallength)
+
+start = time.time()
+array_opt=detailedoptimization(array_opt, optimizationcycles=FineCycles)
+array_opt.rebuildnets()  # just to be sure
+end = time.time()
+
+print("Final length:", array_opt.totallength)
+print("Elapsed time: {0:6.3f}s".format(end-start))
+print()
+# array_opt.printarray()
+
 print("=== Final Placement ===\n")
 
 pdframe = array_opt.returnpdframe()
+pltdata = pdframe.pivot('Y','X','Celltype')
+# print(pltdata)
 pltdata = pdframe.pivot(index='Y',columns='X',values='Celltype')
 print(pltdata)
 pltdata.to_csv(PlacementOutputFile, sep='\t')
@@ -1261,8 +1374,8 @@ pltdata = pdframe.pivot(index='Y',columns='X',values='Nets')
 pltdata.to_csv(NetsOutputFile, sep='\t')
 
 with open(FanoutOutputFile, "w") as file:
-    for key, net in array_opt.nets.items():
-        file.write("{0}\t{1}\n".format(key,len(net[1])))
+    for key, net in sorted(array_opt.nets.items(), key=lambda x: len(x[1][1]), reverse = True):
+        file.write("{0}\t{1}\t{2}\n".format(key,len(net[1])-1,net[1]))
 
 # array_opt.printnets()
 
