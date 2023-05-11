@@ -1202,7 +1202,7 @@ print("Initial net-length:", startarray.totallength)
 print("Initial Placement:\n")
 
 pdframe = startarray.returnpdframe()
-pltdata = pdframe.pivot('Y','X','Celltype')
+pltdata = pdframe.pivot(index='Y',columns='X',values='Celltype')
 print(pltdata)
 print()
 
@@ -1219,7 +1219,7 @@ print("Elapsed time: {0:6.3f}s\n".format(end-start))
 print("=== Candidate Placement ===\n")
 
 pdframe = array_opt.returnpdframe()
-pltdata = pdframe.pivot('Y','X','Celltype')
+pltdata = pdframe.pivot(index='Y',columns='X',values='Celltype')
 print(pltdata)
 
 print("=== Detailed optimization ===\n")
@@ -1241,7 +1241,7 @@ print()
 print("=== Final Placement ===\n")
 
 pdframe = array_opt.returnpdframe()
-pltdata = pdframe.pivot('Y','X','Celltype')
+pltdata = pdframe.pivot(index='Y',columns='X',values='Celltype')
 print(pltdata)
 pltdata.to_csv(PlacementOutputFile, sep='\t')
 
@@ -1256,7 +1256,7 @@ print(f"\nTotal area usage by logic cells: {sum(microcelldict.values())}\n")
 
 print("\n=== Final Nets ===\n")
 
-pltdata = pdframe.pivot('Y','X','Nets')
+pltdata = pdframe.pivot(index='Y',columns='X',values='Nets')
 # print(pltdata)
 pltdata.to_csv(NetsOutputFile, sep='\t')
 
