@@ -1,0 +1,56 @@
+# Verilog to Discrete LED-Transistor-Logic
+
+# Read verilog description of cells
+# read_verilog -lib ../20_SYNTH/discrete_LTL_logic_cells.v
+
+#Wokwi cells library
+read_verilog ../20_SYNTH/cells_wokwi.v
+
+#Synth is required here to properly map the DFF
+synth  
+
+# read design source
+read_verilog design.v
+
+# flatten, prep
+prep -flatten -auto-top
+
+# Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
+rename -top main
+
+# Draw netlist of elaborated design
+show -format pdf -prefix 200_diagramm_hdl_elaborated 
+
+dfflibmap -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
+
+#stat
+
+# Insert tristate buffers (ATTENTION: Currently not a supported cell type during P&R)
+tribuf
+
+# Technology mapping
+techmap
+
+proc; opt; fsm; opt; 
+#dfflibmap -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
+#proc; opt;
+abc -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
+opt -purge
+opt_clean -purge
+# hierarchy -purge_lib
+
+# Print Statistics
+stat -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
+
+# Draw netlist of optimized and mapped design
+show -format pdf -prefix 201_diagramm_after_mapping
+
+# Remove top attribute from main module, so a proper spice subckt is generated
+setattr -mod -unset top main
+
+# Write out in spice format
+write_spice 209_synthesized_output.sp
+write_json  210_synthesized_output.json
+
+
+
