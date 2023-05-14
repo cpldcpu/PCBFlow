@@ -1211,8 +1211,8 @@ def bufferinsertion(array_in: CellArray,netkey:str,maxfo:int=8) -> bool:
 
 # !!! You need to update the lines below to adjust for your design!!! 
 
-ArrayXwidth = 20        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 740        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+ArrayXwidth = 18        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
+DesignArea  = 100        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
@@ -1322,10 +1322,12 @@ print()
 print("=== Buffer insertion ===\n")
 
 start = time.time()
+buffercellsused = False
 
 for netkey, data in array_opt.nets.items():
     if len(data[1])>MaxFanOut:
         bufferinsertion(array_opt, netkey,maxfo=MaxFanOut)
+        buffercellsused = True
 
 array_opt.rebuildnets()
 end = time.time()
@@ -1333,21 +1335,22 @@ end = time.time()
 print("Elapsed time: {0:6.3f}s".format(end-start))
 print()
 
-print("=== Optimizing buffer cell placement ===\n")
+if buffercellsused:
+    print("=== Optimizing buffer cell placement ===\n")
+    array_opt.optimizationrules([20,2.5,1])
+    print("Initial length:", array_opt.totallength)
 
-array_opt.optimizationrules([20,2.5,1])
+    start = time.time()
+    array_opt=detailedoptimization(array_opt, optimizationcycles=FineCycles)
+    array_opt.rebuildnets()  # just to be sure
+    end = time.time()
 
-print("Initial length:", array_opt.totallength)
-
-start = time.time()
-array_opt=detailedoptimization(array_opt, optimizationcycles=FineCycles)
-array_opt.rebuildnets()  # just to be sure
-end = time.time()
-
-print("Final length:", array_opt.totallength)
-print("Elapsed time: {0:6.3f}s".format(end-start))
-print()
+    print("Final length:", array_opt.totallength)
+    print("Elapsed time: {0:6.3f}s".format(end-start))
+    print()
 # array_opt.printarray()
+else:
+    print("No buffer cells inserted\n")
 
 print("=== Final Placement ===\n")
 
