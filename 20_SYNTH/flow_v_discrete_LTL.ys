@@ -1,19 +1,24 @@
 # Verilog to Discrete LED-Transistor-Logic
 
+# read design source
+read_verilog design.v
+hierarchy -check
+flatten
+
 # Read verilog description of cells
-# read_verilog -lib ../20_SYNTH/discrete_LTL_logic_cells.v
+read_verilog -lib ../20_SYNTH/discrete_LTL_logic_cells.v
 
 #Wokwi cells library
-read_verilog ../20_SYNTH/cells_wokwi.v
+#read_verilog ../20_SYNTH/cells_wokwi.v
 
 #Synth is required here to properly map the DFF
 synth  
 
 # read design source
-read_verilog design.v
+# read_verilog design.v
 
 # flatten, prep
-prep -flatten -auto-top
+# prep -flatten -auto-top
 
 # Rename top entity to 'main'. This is important, otherwise other parts of the flow may break.
 rename -top main
@@ -26,14 +31,14 @@ dfflibmap -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
 #stat
 
 # Insert tristate buffers (ATTENTION: Currently not a supported cell type during P&R)
-tribuf
+# tribuf
 
 # Technology mapping
 techmap
 
 proc; opt; fsm; opt; 
 #dfflibmap -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
-#proc; opt;
+proc; opt;
 abc -liberty ../20_SYNTH/discrete_LTL_logic_liberty.lib
 opt -purge
 opt_clean -purge
