@@ -559,22 +559,49 @@ class CellArray():
         else:
             celltype='IO'
 
+        if any(net == x[0] for x in FixedIO):   # check if net is in FixedIO list and skip insertion if so
+            return
+        
         for key, val in self.array.items():
             if val.type == "EMPTY" and val.y == 0:
-                if net in FixedIO:
-                    if val.x==FixedIO.index(net):
-                        del self.array[key]
-                        self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
-                        if net in LEDS:
-                            self.addled(net,val.x,val.y+1)
-                        return
-                elif val.x>=len(FixedIO):
-                    del self.array[key]
-                    self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
-                    if net in LEDS:
-                        self.addled(net,val.x,val.y+1)
-                    return  
+                del self.array[key]
+                self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
+                if net in LEDS:
+                    self.addled(net,val.x,val.y+1)
+                return  
+
+        # for key, val in self.array.items():
+        #     if val.type == "EMPTY" and val.y == 0:
+        #         if net in FixedIO:
+        #             if val.x==FixedIO.index(net):
+        #                 del self.array[key]
+        #                 self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
+        #                 if net in LEDS:
+        #                     self.addled(net,val.x,val.y+1)
+        #                 return
+        #         elif val.x>=len(FixedIO):
+        #             del self.array[key]
+        #             self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
+        #             if net in LEDS:
+        #                 self.addled(net,val.x,val.y+1)
+        #             return  
         raise CAParsingError("Could not insert I/O cell in line zero! Please increase the X-width of the cell array or correct FixedIO assignment.")
+
+    def addfixediocells(self,  FixedIO=[]):
+        """ add all FixedIO locations"""
+        for net, iox, ioy in FixedIO:
+            if net in Pullups:
+                celltype='IOP'
+            else:
+                celltype='IO'
+
+            for key, val in self.array.items():
+                if val.type == "EMPTY" and val.x == iox and val.y == ioy:
+                    del self.array[key]
+                    self.array["XIO"+str(net)] = Cell(celltype, False, val.x, val.y,'input', [net])                
+                    break
+            else:
+                raise CAParsingError("Could not insert IO cell for NET: "+str(net))
 
     def addled(self, net , x , y ):
         """ add LED at fixed position"""
@@ -810,15 +837,15 @@ class CellArray():
             self.insertcell(name+"a" ,"ltl_WAND4"   ,   [nets[0]  , nets[1]   , nets[2]  , nets[3]  , name+"i!" ])
             self.insertcell(name+"b" ,"ltl_NOTs"    ,   [name+"i!", nets[4]   ])
         elif celltype == "ltl_DFFNP":  # pin order: C, D, Q, Qn
-#            self.addlogiccell(name+"a","ltl_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])     # pure LTL version fail simulation, but works in circuit
-            self.addlogiccell(name+"a","nm_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])   
+            self.addlogiccell(name+"a","ltl_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])     # pure LTL version fail simulation, but works in circuit
+            # self.addlogiccell(name+"a","nm_NAND2"  , [nets[1]   , name+"b"  , name+"a"  ])   
             self.addlogiccell(name+"b","ltl_NAND3"  , [name+"a"  , nets[0]   , name+"c", name+"b" ])               
             self.addlogiccell(name+"c","ltl_NAND2"  , [nets[0]   , name+"d"  , name+"c"  ])   
             self.addlogiccell(name+"d","ltl_NAND2"  , [name+"c"  , name+"a"  , name+"d"  ])   
             self.addlogiccell(name+"e","ltl_NAND2"  , [name+"b"  , nets[2]   , nets[3]   ])   
             self.addlogiccell(name+"f","ltl_NAND2"  , [nets[3]   , name+"c"  , nets[2]   ])   
-            # self.peephole.append(["DFF_with_Qn", nets[2], nets[3] ])
-            # self.peephole.append(["DFF_with_Qn", nets[3], nets[2] ])
+            self.peephole.append(["DFF_with_Qn", nets[2], nets[3] ])
+            self.peephole.append(["DFF_with_Qn", nets[3], nets[2] ])
             # e = Qn, f = Q
         elif celltype == "ltl_DFFNP_CLR":  # pin order: C, nRes, D, Q, Qn
             self.addlogiccell(name+"a","ltl_NAND3"  , [nets[2]   , name+"b"  , nets[1]  , name+"a"   ])   
@@ -1018,7 +1045,8 @@ class CellArray():
     def optimizesimulatedannealing(self, iterations:int = 1000, temperature:float = 1) -> None:
         """ Optimize by simulated annealing. """
         for i in range(iterations):
-            cell1, cell2 = random.sample(self.array.keys(),2)
+            # cell1, cell2 = random.sample(self.array.keys(),2)
+            cell1, cell2 = random.sample(list(self.array.keys()), 2) # python >3.9 compatibility
             if self.array[cell1].moveable == False or self.array[cell2].moveable == False:
                 # Don't exchange fixed cells
                 continue
@@ -1212,9 +1240,10 @@ def bufferinsertion(array_in: CellArray,netkey:str,maxfo:int=8) -> bool:
 # !!! You need to update the lines below to adjust for your design!!! 
 
 ArrayXwidth = 18        # This is the width of the grid and should be equal to or larger than the number of I/O pins plus two supply pins!
-DesignArea  = 100        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
+DesignArea  = 180        # This is the number of unit cells required for the design. It is outputted as "chip area" during the Synthesis step
                         # Fixedio fixes I/O positions within the first row. Leave empty if you want the tool to assign positions.
 FixedIO     = []        # Default, tool assigns I/O
+# FixedIO     = [["VCC",0,0],["GND",0,12]]
 # FixedIO     =      ["VCC","inv_a", "inv_y", "xor_a", "xor_b", "xor_y", "and_a", "and_b", "and_y", "d", "clk", "q"] # for moregates.vhd
 
                         # Insert monitoring LEDs for I/O pins in list
@@ -1268,7 +1297,9 @@ print("Array Xwidth: {0}\nArray Ywidth: {1}\n".format(startarray.SizeX, startarr
 
 print("=== Parsing input file & Inserting Microcells ===\n")
 
+startarray.addfixediocells(FixedIO) # Add fixed IO cells if there are any
 parsesptocellarray(InputFileName,startarray,FixedIO,LEDS,Pullups)
+
 print("Parsing successful...")
 print()
 
@@ -1326,8 +1357,8 @@ buffercellsused = False
 
 for netkey, data in array_opt.nets.items():
     if len(data[1])>MaxFanOut:
-        bufferinsertion(array_opt, netkey,maxfo=MaxFanOut)
-        buffercellsused = True
+        if bufferinsertion(array_opt, netkey,maxfo=MaxFanOut):
+            buffercellsused = True
 
 array_opt.rebuildnets()
 end = time.time()
@@ -1355,7 +1386,7 @@ else:
 print("=== Final Placement ===\n")
 
 pdframe = array_opt.returnpdframe()
-pltdata = pdframe.pivot('Y','X','Celltype')
+# pltdata = pdframe.pivot('Y','X','Celltype')
 # print(pltdata)
 pltdata = pdframe.pivot(index='Y',columns='X',values='Celltype')
 print(pltdata)
