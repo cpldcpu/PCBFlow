@@ -15,6 +15,20 @@ from copy import deepcopy
 import pandas as pd
 from lxml import etree as et
 from dataclasses import dataclass
+
+# Constants
+DEFAULT_PITCH_X = 5
+DEFAULT_PITCH_Y = 7
+DEFAULT_ARRAY_X_WIDTH = 18
+DEFAULT_DESIGN_AREA = 180
+DEFAULT_AREA_MARGIN = 0.2
+DEFAULT_COARSE_ATTEMPTS = 20
+DEFAULT_COARSE_CYCLES = 1000
+DEFAULT_FINE_CYCLES = 10000
+DEFAULT_MAX_FANOUT = 10
+DEFAULT_PCB_PITCH_X = 2.54 * 1.5
+DEFAULT_PCB_PITCH_Y = 2.54 * 2.5
+
 class PCBPlacer():
     """ Handles insertion into the actual PCB templates. Load eagle template, insert footprints, output board."""
     def __init__(self, filename):
@@ -69,14 +83,6 @@ class PCBPlacer():
         self.countcomponent("npn transistor")
         self.countcomponent("resistor",2)
         self.countcomponent("led")
-
-        # doppelled
-        # et.SubElement(n_elements, 'element', name = "Rl2"+cellname, library="discrete_logic_components", package="RES0402", value="RES", x=str(x+1), y=str(y+5.3))
-        # et.SubElement(n_elements, 'element', name = "L2"+cellname, library="discrete_logic_components", package="LED0603", value="RES", x=str(x+4.25), y=str(y+3.4) ,rot="R180")
-        # self.addcontact("Bc$" + str(self.devcounter) , "Rl2"+cellname, "2" )
-        # self.addcontact("Bc$" + str(self.devcounter) , "L2"+cellname, "A" )
-        # self.addcontact('VCC' , "Rl2"+cellname, "1" )
-        # self.addcontact("B$" + str(self.devcounter+1) , "L2"+cellname, "C")
 
         self.addcontact('GND' , "Q"+cellname, "2" )
         self.addcontact("B$" + str(self.devcounter) , "Rl"+cellname, "2" )
@@ -333,7 +339,7 @@ class PCBPlacer():
             et.SubElement(n_elements, 'element', name = "C"+cellname, library="discrete_logic_components", package="CAP0402", value="CAP", x=str(x+4.2), y=str(y+1.4),rot="R90")
             self.countcomponent("cap")
             self.addcontact('VCC'  , "C"+cellname, "2" )
-            self.addcontact('GND'  , "C"+cellname, "1" ) 
+            self.addcontact('GND'  , "C"+cellname, "1" )
 
         self.addcontact(netinb , "Q"+cellname, "1" )
         self.addcontact('GND'  , "Q"+cellname, "2" )
@@ -348,7 +354,6 @@ class PCBPlacer():
 
         n_elements = self.n_board.find('elements')
         et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SOT23-6", value="74LVC1G175", x=str(x+1.6), y=str(y+1.4+0.6))
-        # et.SubElement(n_elements, 'element', name = "Q"+cellname, library="discrete_logic_components", package="SC70-6", value="74LVC1G175", x=str(x+1.6), y=str(y+1.4+0.6))
         self.countcomponent("1G175")
         cap=False
         if cap==True:
@@ -570,21 +575,6 @@ class CellArray():
                     self.addled(net,val.x,val.y+1)
                 return  
 
-        # for key, val in self.array.items():
-        #     if val.type == "EMPTY" and val.y == 0:
-        #         if net in FixedIO:
-        #             if val.x==FixedIO.index(net):
-        #                 del self.array[key]
-        #                 self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
-        #                 if net in LEDS:
-        #                     self.addled(net,val.x,val.y+1)
-        #                 return
-        #         elif val.x>=len(FixedIO):
-        #             del self.array[key]
-        #             self.array["XIO"+str(val.x)] = Cell(celltype, False, val.x, val.y,'center', [net])
-        #             if net in LEDS:
-        #                 self.addled(net,val.x,val.y+1)
-        #             return  
         raise CAParsingError("Could not insert I/O cell in line zero! Please increase the X-width of the cell array or correct FixedIO assignment.")
 
     def addfixediocells(self,  FixedIO=[]):
